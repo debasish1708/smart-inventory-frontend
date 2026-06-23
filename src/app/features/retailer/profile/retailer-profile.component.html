@@ -1,0 +1,40 @@
+<app-layout pageTitle="My Profile" [navItems]="nav" roleLabel="Retailer Portal">
+  <div *ngIf="loading" class="empty-state card"><div class="empty-icon">⏳</div><p>Loading…</p></div>
+  <ng-container *ngIf="!loading">
+    <div class="card profile-header-card">
+      <div class="profile-avatar">{{ initials }}</div>
+      <div>
+        <div class="profile-name">{{ profile?.firstName ? profile.firstName+' '+profile.lastName : profile?.email }}</div>
+        <div class="profile-email">{{ profile?.email }}</div>
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <span class="badge badge-active" *ngIf="profile?.userStatus==='ACTIVE'">Active</span>
+          <span class="badge badge-pending" *ngIf="profile?.userStatus==='PENDING'">Pending Approval</span>
+          <span style="font-size:12px;color:#2e7d32" *ngIf="profile?.profileCompleted">✓ Profile Complete</span>
+          <span style="font-size:12px;color:#e65100" *ngIf="!profile?.profileCompleted">⚠ Incomplete</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">✏️ {{ profile?.profileCompleted ? 'Update Profile' : 'Complete Your Profile' }}</div>
+      <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+      <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+      <div class="grid-2">
+        <div class="form-group"><label>First Name *</label><input [(ngModel)]="form.firstName"></div>
+        <div class="form-group"><label>Last Name *</label><input [(ngModel)]="form.lastName"></div>
+        <div class="form-group"><label>Business Name *</label><input [(ngModel)]="form.businessName"></div>
+        <div class="form-group"><label>Business Type</label><input [(ngModel)]="form.businessType" placeholder="Retail / Wholesale"></div>
+        <div class="form-group"><label>Mobile *</label><input [(ngModel)]="form.mobNo"></div>
+        <div class="form-group"><label>GST Number</label><input [(ngModel)]="form.gst"></div>
+        <div class="form-group full-width"><label>Address *</label><input [(ngModel)]="form.address"></div>
+        <div class="form-group"><label>City *</label><input [(ngModel)]="form.city"></div>
+        <div class="form-group"><label>State *</label><input [(ngModel)]="form.state"></div>
+        <div class="form-group"><label>Pincode *</label><input [(ngModel)]="form.pincode"></div>
+      </div>
+      <div style="margin-top:16px">
+        <button class="btn-primary" style="max-width:200px" (click)="save()" [disabled]="saving">
+          <span *ngIf="saving" class="spinner"></span>{{ saving?'Saving…':'Save Profile' }}
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</app-layout>

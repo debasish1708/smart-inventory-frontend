@@ -1,0 +1,36 @@
+<app-layout pageTitle="Retailer Management" [navItems]="nav" roleLabel="Admin Panel">
+  <div class="card">
+    <div class="section-header"><h2>🏪 Retailers</h2><button class="btn-secondary" (click)="load()">🔄 Refresh</button></div>
+    <div *ngIf="toast" class="alert" [class]="toastType==='success'?'alert-success':'alert-error'">{{ toast }}</div>
+    <div class="filter-bar">
+      <input [(ngModel)]="search" (input)="apply()" placeholder="Search email…">
+      <select [(ngModel)]="filterStatus" (change)="apply()">
+        <option value="">All Status</option><option>ACTIVE</option><option>PENDING</option><option>BLOCKED</option>
+      </select>
+    </div>
+    <div *ngIf="loading" class="empty-state"><div class="empty-icon">⏳</div><p>Loading…</p></div>
+    <div class="table-wrap" *ngIf="!loading">
+      <table>
+        <thead><tr><th>#</th><th>Email</th><th>Profile</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let u of filtered; let i=index">
+            <td>{{ i+1 }}</td><td>{{ u.email }}</td>
+            <td>{{ u.profileStatus }}</td>
+            <td><span class="badge" [class]="'badge-'+u.status.toLowerCase()">{{ u.status }}</span></td>
+            <td>{{ u.createdAt | date:'dd MMM yyyy' }}</td>
+            <td>
+              <div class="actions">
+                <button class="btn-sm btn-info" (click)="viewProfile(u)">👁 Profile</button>
+                <button *ngIf="u.status!=='ACTIVE'"  class="btn-sm btn-success" (click)="approve(u)">✓ Approve</button>
+                <button *ngIf="u.status==='ACTIVE'"  class="btn-sm btn-warn"    (click)="block(u)">🚫 Block</button>
+                <button *ngIf="u.status==='BLOCKED'" class="btn-sm btn-success" (click)="unblock(u)">↩ Unblock</button>
+                <button class="btn-sm btn-danger" (click)="del(u)">🗑</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filtered.length===0"><td colspan="6"><div class="empty-state"><div class="empty-icon">🏪</div><p>No retailers found</p></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</app-layout>

@@ -1,0 +1,53 @@
+<div class="auth-wrapper">
+  <div class="auth-card" style="max-width:500px">
+    <div class="brand"><h1>🏪 Smart Inventory</h1><p>Create your account</p></div>
+    <div *ngIf="error"   class="alert alert-error">{{ error }}</div>
+    <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+    <div class="form-group">
+      <label>Email Address *</label>
+      <input type="email" [(ngModel)]="email" placeholder="you@example.com" [class.error]="submitted && emailErr">
+      <span *ngIf="submitted && emailErr" class="error-msg">{{ emailErr }}</span>
+    </div>
+    <div class="form-group">
+      <label>Register As *</label>
+      <select [(ngModel)]="role" [class.error]="submitted && !role">
+        <option value="">— Select Role —</option>
+        <option value="RETAILER">Retailer</option>
+        <option value="SUPPLIER">Supplier</option>
+      </select>
+      <span *ngIf="submitted && !role" class="error-msg">Please select a role</span>
+    </div>
+    <div class="form-group">
+      <label>Password *</label>
+      <div class="password-wrap">
+        <input [type]="showPass?'text':'password'" [(ngModel)]="password" (input)="onPasswordInput()" placeholder="Min 6 chars" [class.error]="submitted && passErr">
+        <span class="toggle-eye" (click)="showPass=!showPass">{{ showPass?'🙈':'👁' }}</span>
+      </div>
+      <span *ngIf="submitted && passErr" class="error-msg">{{ passErr }}</span>
+      <div class="strength-meter" *ngIf="password.length > 0">
+        <div class="strength-bar"><div class="strength-fill" [style.width.%]="strength.percent" [style.background]="strength.color"></div></div>
+        <div class="strength-label" [style.color]="strength.color">Strength: <strong>{{ strength.label }}</strong></div>
+        <div class="checks-row">
+          <span [class.check-ok]="checks.length"  [class.check-no]="!checks.length">{{ checks.length?'✓':'✗'  }} 6+ chars</span>
+          <span [class.check-ok]="checks.upper"   [class.check-no]="!checks.upper">{{ checks.upper?'✓':'✗'   }} Uppercase</span>
+          <span [class.check-ok]="checks.lower"   [class.check-no]="!checks.lower">{{ checks.lower?'✓':'✗'   }} Lowercase</span>
+          <span [class.check-ok]="checks.number"  [class.check-no]="!checks.number">{{ checks.number?'✓':'✗' }} Number</span>
+          <span [class.check-ok]="checks.special" [class.check-no]="!checks.special">{{ checks.special?'✓':'✗'}} Special</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Confirm Password *</label>
+      <div class="password-wrap">
+        <input [type]="showConfirm?'text':'password'" [(ngModel)]="confirmPassword" placeholder="Re-enter password" [class.error]="submitted && confirmErr">
+        <span class="toggle-eye" (click)="showConfirm=!showConfirm">{{ showConfirm?'🙈':'👁' }}</span>
+      </div>
+      <span *ngIf="submitted && confirmErr" class="error-msg">{{ confirmErr }}</span>
+    </div>
+    <button class="btn-primary" (click)="register()" [disabled]="loading">
+      <span *ngIf="loading" class="spinner"></span>{{ loading?'Registering…':'Create Account' }}
+    </button>
+    <div class="auth-link">Already have an account? <a routerLink="/auth/login">Sign In</a></div>
+  </div>
+</div>

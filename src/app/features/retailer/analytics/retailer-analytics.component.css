@@ -1,0 +1,8 @@
+.health-row { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:12px; }
+.health-item { display:flex; align-items:center; gap:6px; font-size:13px; color:#555; }
+.dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+.dot.green  { background:#43a047; }
+.dot.orange { background:#ff9800; }
+.dot.red    { background:#e53935; }
+.health-bar-outer { display:flex; height:12px; border-radius:6px; overflow:hidden; }
+.health-segment   { height:100%; }

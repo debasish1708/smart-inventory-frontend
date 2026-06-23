@@ -1,0 +1,93 @@
+<app-layout pageTitle="Retailer Dashboard" [navItems]="nav" roleLabel="Retailer Portal">
+
+  <!-- Profile incomplete -->
+  <div *ngIf="!profileCompleted" class="pending-banner">
+    <div class="icon">📋</div>
+    <h3>Complete Your Profile First</h3>
+    <p>Fill in your business details to unlock all features.</p>
+    <a routerLink="/retailer/profile" class="btn-primary" style="display:inline-block;width:auto;padding:10px 28px;margin-top:14px;text-decoration:none">
+      Complete Profile →
+    </a>
+  </div>
+
+  <!-- Pending approval -->
+  <div *ngIf="profileCompleted && userStatus === 'PENDING'" class="pending-banner" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);border-color:#1976d2">
+    <div class="icon">⏳</div>
+    <h3 style="color:#0d47a1">Awaiting Admin Approval</h3>
+    <p style="color:#1565c0">Your profile is under review. You'll get full platform access once approved.</p>
+  </div>
+
+  <ng-container *ngIf="profileCompleted && userStatus === 'ACTIVE'">
+    <div class="welcome-msg">
+      <h2>Welcome back, {{ userName }}! 👋</h2>
+      <p>Here's your inventory & order summary for today.</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon bg-blue">📦</div>
+        <div class="stat-info"><h3>{{ stats.inventory }}</h3><p>Inventory Items</p></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon bg-orange">🛒</div>
+        <div class="stat-info"><h3>{{ stats.orders }}</h3><p>Total Orders</p></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon bg-red">⚠️</div>
+        <div class="stat-info"><h3>{{ stats.lowStock }}</h3><p>Low Stock Items</p></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon bg-purple">⏳</div>
+        <div class="stat-info"><h3>{{ stats.pendingOrders }}</h3><p>Pending Orders</p></div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Recent Orders -->
+      <div class="card">
+        <div class="card-title">🛒 Recent Orders</div>
+        <div *ngIf="recentOrders.length === 0" class="empty-state">
+          <div class="empty-icon">📭</div>
+          <p>No orders yet</p>
+        </div>
+        <table *ngIf="recentOrders.length > 0">
+          <thead><tr><th>ID</th><th>Supplier</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let o of recentOrders">
+              <td>#{{ o.id }}</td>
+              <td>{{ o.supplierEmail || '—' }}</td>
+              <td><span class="badge" [class]="'badge-' + o.status.toLowerCase()">{{ o.status }}</span></td>
+              <td>{{ o.orderDate | date:'dd MMM' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Notifications -->
+      <div class="card">
+        <div class="card-title">🔔 Alerts</div>
+        <div *ngIf="notifications.length === 0" class="empty-state">
+          <div class="empty-icon">✅</div>
+          <p>No alerts</p>
+        </div>
+        <div *ngFor="let n of notifications" class="notif-item">
+          <span class="notif-icon">⚠️</span>
+          <span class="notif-msg">{{ n.message }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="card">
+      <div class="card-title">⚡ Quick Actions</div>
+      <div class="quick-actions">
+        <a routerLink="/retailer/inventory"     class="quick-btn">📦 My Inventory</a>
+        <a routerLink="/retailer/supplier-match" class="quick-btn">🤝 Find Suppliers</a>
+        <a routerLink="/retailer/orders"         class="quick-btn">🛒 View Orders</a>
+        <a routerLink="/retailer/analytics"      class="quick-btn">📊 Analytics</a>
+      </div>
+    </div>
+  </ng-container>
+
+</app-layout>

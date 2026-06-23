@@ -1,0 +1,11 @@
+.avg-banner { display:flex; align-items:center; gap:16px; }
+.avg-num { font-size:42px; font-weight:700; color:#1565c0; }
+.stars { color:#f57c00; font-size:22px; letter-spacing:2px; }
+.avg-label { color:#888; font-size:13px; }
+.ratings-list { display:flex; flex-direction:column; gap:12px; }
+.rating-card { background:#fff; border-radius:12px; padding:18px 20px; box-shadow:0 2px 10px rgba(0,0,0,0.07); }
+.rating-header { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.rater-avatar { width:40px; height:40px; border-radius:50%; background:linear-gradient(135deg,#6a1b9a,#ab47bc); color:#fff; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.rater-name { font-size:14px; font-weight:600; }
+.rating-date { margin-left:auto; font-size:12px; color:#aaa; }
+.review-text { font-size:13.5px; color:#555; line-height:1.6; margin:0; }

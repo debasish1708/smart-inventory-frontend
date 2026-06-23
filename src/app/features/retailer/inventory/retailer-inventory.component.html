@@ -1,0 +1,73 @@
+<app-layout pageTitle="My Inventory" [navItems]="nav" roleLabel="Retailer Portal">
+  <div class="card">
+    <div class="section-header">
+      <h2>📦 Inventory Management</h2>
+      <button class="btn-primary" style="width:auto;padding:9px 20px" (click)="openAdd()">+ Add Item</button>
+    </div>
+
+    <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+    <div class="filter-bar">
+      <input type="text" [(ngModel)]="search" (input)="applyFilter()" placeholder="Search products…">
+    </div>
+
+    <div *ngIf="loading" class="empty-state"><div class="empty-icon">⏳</div><p>Loading…</p></div>
+
+    <div class="table-wrap" *ngIf="!loading">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Product</th><th>Category</th>
+            <th>Qty</th><th>Threshold</th><th>Price</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of filtered; let i = index">
+            <td>{{ i+1 }}</td>
+            <td><strong>{{ item.productName }}</strong><br><small style="color:#888">{{ item.brand }}</small></td>
+            <td>{{ item.category }}</td>
+            <td [class.low-qty]="lowStock(item)">{{ item.quantity }} {{ item.unit }}</td>
+            <td>{{ item.thresholdValue }}</td>
+            <td>₹{{ item.price | number:'1.2-2' }}</td>
+            <td>
+              <span *ngIf="lowStock(item)"  class="badge badge-blocked">Low Stock</span>
+              <span *ngIf="!lowStock(item)" class="badge badge-active">OK</span>
+            </td>
+            <td>
+              <div class="actions">
+                <button class="btn-sm btn-info"   (click)="openEdit(item)">✏️ Edit</button>
+                <button class="btn-sm btn-danger" (click)="delete(item.id)">🗑</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filtered.length === 0">
+            <td colspan="8"><div class="empty-state"><div class="empty-icon">📭</div><p>No items found</p></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>{{ editItem ? 'Edit Item' : 'Add Inventory Item' }}</h3>
+      <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+      <div class="grid-2">
+        <div class="form-group"><label>Product Name *</label><input [(ngModel)]="form.productName" placeholder="e.g. Rice 5kg"></div>
+        <div class="form-group"><label>Category</label><input [(ngModel)]="form.category" placeholder="e.g. Grocery"></div>
+        <div class="form-group"><label>Quantity *</label><input type="number" [(ngModel)]="form.quantity"></div>
+        <div class="form-group"><label>Threshold</label><input type="number" [(ngModel)]="form.thresholdValue"></div>
+        <div class="form-group"><label>Price (₹)</label><input type="number" [(ngModel)]="form.price"></div>
+        <div class="form-group"><label>Unit</label><input [(ngModel)]="form.unit" placeholder="kg / pcs / litre"></div>
+        <div class="form-group"><label>Brand</label><input [(ngModel)]="form.brand"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeModal()">Cancel</button>
+        <button class="btn-primary" style="width:auto;padding:9px 24px" (click)="save()" [disabled]="saving">
+          <span *ngIf="saving" class="spinner"></span>{{ saving ? 'Saving…' : 'Save' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</app-layout>

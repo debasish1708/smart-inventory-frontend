@@ -1,0 +1,38 @@
+<app-layout pageTitle="Order Management" [navItems]="nav" roleLabel="Supplier Portal">
+  <div class="card">
+    <div class="section-header"><h2>📋 Incoming Orders</h2></div>
+    <div *ngIf="toast" class="alert" [class]="toastType==='success'?'alert-success':'alert-error'">{{ toast }}</div>
+    <div class="filter-bar">
+      <select [(ngModel)]="filterStatus" (change)="apply()">
+        <option value="">All Status</option>
+        <option>PENDING</option><option>ACCEPTED</option><option>DISPATCHED</option><option>DELIVERED</option><option>CANCELLED</option>
+      </select>
+      <button class="btn-secondary" (click)="load()">🔄 Refresh</button>
+    </div>
+    <div *ngIf="loading" class="empty-state"><div class="empty-icon">⏳</div><p>Loading…</p></div>
+    <div class="table-wrap" *ngIf="!loading">
+      <table>
+        <thead><tr><th>Order ID</th><th>Retailer</th><th>Order Date</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let o of filtered">
+            <td>#{{ o.id }}</td>
+            <td>{{ o.retailerEmail||'—' }}</td>
+            <td>{{ o.orderDate | date:'dd MMM yyyy' }}</td>
+            <td><span class="badge" [class]="'badge-'+o.status.toLowerCase()">{{ o.status }}</span></td>
+            <td>
+              <div class="actions">
+                <button *ngFor="let s of nextStatuses(o.status)"
+                  class="btn-sm"
+                  [class.btn-success]="s==='ACCEPTED'||s==='DELIVERED'"
+                  [class.btn-info]="s==='DISPATCHED'"
+                  [class.btn-danger]="s==='CANCELLED'"
+                  (click)="updateStatus(o,s)">{{ s }}</button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filtered.length===0"><td colspan="5"><div class="empty-state"><div class="empty-icon">📭</div><p>No orders</p></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</app-layout>

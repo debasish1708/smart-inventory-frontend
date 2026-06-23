@@ -1,0 +1,6 @@
+.welcome { margin-bottom:20px; }
+.welcome h2 { font-size:20px; font-weight:700; }
+.welcome p  { color:#666; font-size:14px; margin-top:4px; }
+.quick-actions { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; }
+.quick-btn { display:block; padding:16px; background:#f5f7fa; border-radius:10px; text-decoration:none; color:#1a1a2e; font-size:14px; font-weight:500; text-align:center; transition:background .2s,transform .2s; }
+.quick-btn:hover { background:#fce4ec; color:#ad1457; transform:translateY(-2px); }

@@ -1,0 +1,48 @@
+<app-layout pageTitle="Analytics" [navItems]="nav" roleLabel="Retailer Portal">
+  <div *ngIf="loading" class="empty-state card"><div class="empty-icon">⏳</div><p>Loading analytics…</p></div>
+
+  <ng-container *ngIf="!loading">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon bg-blue">🛒</div>
+        <div class="stat-info"><h3>{{ summary.totalOrders }}</h3><p>Total Orders</p></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon bg-green">💰</div>
+        <div class="stat-info"><h3>₹{{ summary.totalRevenue | number:'1.0-0' }}</h3><p>Total Revenue</p></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon bg-orange">🏆</div>
+        <div class="stat-info"><h3 style="font-size:16px">{{ summary.topProduct }}</h3><p>Top Product</p></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon bg-purple">📈</div>
+        <div class="stat-info"><h3>{{ summary.monthlyGrowth | number:'1.0-1' }}%</h3><p>Growth</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📦 Inventory Health</div>
+      <div class="health-row">
+        <div class="health-item"><span class="dot green"></span> In Stock: {{ inventoryStats.ok }} items ({{ pct(inventoryStats.ok) }}%)</div>
+        <div class="health-item"><span class="dot orange"></span> Low Stock: {{ inventoryStats.low }} items ({{ pct(inventoryStats.low) }}%)</div>
+        <div class="health-item"><span class="dot red"></span> Out of Stock: {{ inventoryStats.out }} items ({{ pct(inventoryStats.out) }}%)</div>
+      </div>
+      <div class="health-bar-outer" *ngIf="totalInv > 1">
+        <div class="health-segment" [style.width.%]="pct(inventoryStats.ok)"  style="background:#43a047"></div>
+        <div class="health-segment" [style.width.%]="pct(inventoryStats.low)" style="background:#ff9800"></div>
+        <div class="health-segment" [style.width.%]="pct(inventoryStats.out)" style="background:#e53935"></div>
+      </div>
+      <div *ngIf="totalInv === 1" class="alert alert-info" style="margin-top:12px">Add inventory items to see health breakdown.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">ℹ️ About Analytics</div>
+      <p style="font-size:13.5px;color:#666;line-height:1.7">
+        Revenue and order counts are calculated from your delivered orders in real time from the database.
+        The top product is the item with the highest total quantity ordered across all your orders.
+        Inventory health reflects your current live stock levels.
+      </p>
+    </div>
+  </ng-container>
+</app-layout>

@@ -1,0 +1,32 @@
+<app-layout pageTitle="Analytics" [navItems]="nav" roleLabel="Supplier Portal">
+  <div *ngIf="loading" class="empty-state card"><div class="empty-icon">⏳</div><p>Loading analytics…</p></div>
+
+  <ng-container *ngIf="!loading">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon bg-purple">📋</div><div class="stat-info"><h3>{{ summary.totalOrders }}</h3><p>Total Orders</p></div></div>
+      <div class="stat-card"><div class="stat-icon bg-green">💰</div><div class="stat-info"><h3>₹{{ summary.totalRevenue | number:'1.0-0' }}</h3><p>Total Revenue</p></div></div>
+      <div class="stat-card"><div class="stat-icon bg-orange">🏆</div><div class="stat-info"><h3 style="font-size:16px">{{ summary.topProduct }}</h3><p>Top Product</p></div></div>
+      <div class="stat-card"><div class="stat-icon bg-teal">⭐</div><div class="stat-info"><h3>{{ summary.monthlyGrowth | number:'1.1-1' }}</h3><p>Avg Rating</p></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🏭 Listings Status</div>
+      <div class="health-row">
+        <div class="health-item"><span class="dot green"></span> Active: {{ inventoryByStatus.active }}</div>
+        <div class="health-item"><span class="dot red"></span> Inactive: {{ inventoryByStatus.inactive }}</div>
+      </div>
+      <div class="health-bar-outer" *ngIf="inventoryByStatus.active + inventoryByStatus.inactive > 0">
+        <div class="health-segment" [style.width.%]="inventoryByStatus.active / (inventoryByStatus.active + inventoryByStatus.inactive) * 100" style="background:#43a047"></div>
+        <div class="health-segment" [style.width.%]="inventoryByStatus.inactive / (inventoryByStatus.active + inventoryByStatus.inactive) * 100" style="background:#e53935"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">ℹ️ About Analytics</div>
+      <p style="font-size:13.5px;color:#666;line-height:1.7">
+        Revenue is summed from your delivered orders. Top product is the item with highest total quantity fulfilled.
+        Average rating is computed live from all retailer reviews of your account.
+      </p>
+    </div>
+  </ng-container>
+</app-layout>

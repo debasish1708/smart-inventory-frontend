@@ -1,0 +1,25 @@
+<app-layout pageTitle="Platform Analytics" [navItems]="nav" roleLabel="Admin Panel">
+  <div class="stats-grid" *ngIf="stats">
+    <div class="stat-card"><div class="stat-icon bg-blue">👥</div><div class="stat-info"><h3>{{ stats.total }}</h3><p>Total Users</p></div></div>
+    <div class="stat-card"><div class="stat-icon bg-green">✅</div><div class="stat-info"><h3>{{ stats.active }}</h3><p>Active</p></div></div>
+    <div class="stat-card"><div class="stat-icon bg-orange">⏳</div><div class="stat-info"><h3>{{ stats.pending }}</h3><p>Pending</p></div></div>
+    <div class="stat-card"><div class="stat-icon bg-red">🚫</div><div class="stat-info"><h3>{{ stats.blocked }}</h3><p>Blocked</p></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📈 New User Registrations (Monthly)</div>
+    <div class="bar-chart">
+      <div class="bar-wrap" *ngFor="let d of growthData">
+        <span class="bar-val">{{ d.users }}</span>
+        <div class="bar" style="background:linear-gradient(to top,#ad1457,#f06292)" [style.height.%]="barH(d.users)"></div>
+        <span class="bar-label">{{ d.month }}</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🥧 User Distribution</div>
+    <div class="dist-list">
+      <div class="dist-item"><span class="dist-dot" style="background:#1565c0"></span><span>Retailers</span><span class="dist-bar-w"><div class="dist-bar" style="background:#1565c0;width:60%"></div></span><span>60%</span></div>
+      <div class="dist-item"><span class="dist-dot" style="background:#6a1b9a"></span><span>Suppliers</span><span class="dist-bar-w"><div class="dist-bar" style="background:#6a1b9a;width:40%"></div></span><span>40%</span></div>
+    </div>
+  </div>
+</app-layout>

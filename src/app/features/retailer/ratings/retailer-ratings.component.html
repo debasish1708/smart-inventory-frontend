@@ -1,0 +1,21 @@
+<app-layout pageTitle="My Ratings" [navItems]="nav" roleLabel="Retailer Portal">
+  <div class="card">
+    <div class="card-title">⭐ Ratings Received</div>
+    <div class="avg-banner"><span class="avg-num">{{ avgRating | number:'1.1-1' }}</span><span class="stars">{{ '★'.repeat(5) }}</span><span class="avg-label">Average Rating</span></div>
+  </div>
+  <div *ngIf="loading" class="empty-state card"><div class="empty-icon">⏳</div><p>Loading…</p></div>
+  <div class="ratings-list" *ngIf="!loading">
+    <div class="rating-card" *ngFor="let r of ratings">
+      <div class="rating-header">
+        <div class="rater-avatar">{{ r.supplierEmail?.charAt(0).toUpperCase() }}</div>
+        <div>
+          <div class="rater-name">{{ r.supplierEmail }}</div>
+          <div class="stars">{{ stars(r.rating) }}</div>
+        </div>
+        <div class="rating-date">{{ r.createdAt | date:'dd MMM yyyy' }}</div>
+      </div>
+      <p class="review-text">{{ r.review }}</p>
+    </div>
+    <div *ngIf="ratings.length===0" class="empty-state"><div class="empty-icon">⭐</div><p>No ratings yet</p></div>
+  </div>
+</app-layout>

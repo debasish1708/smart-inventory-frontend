@@ -1,0 +1,4 @@
+.checks-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+.checks-row span { font-size:11.5px; }
+.check-ok { color:#2e7d32; }
+.check-no { color:#e53935; }

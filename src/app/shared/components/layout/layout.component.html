@@ -1,0 +1,9 @@
+<div class="app-shell">
+  <app-sidebar [navItems]="navItems" [roleLabel]="roleLabel"></app-sidebar>
+  <div class="main-area">
+    <app-topbar [pageTitle]="pageTitle"></app-topbar>
+    <div class="page-content">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

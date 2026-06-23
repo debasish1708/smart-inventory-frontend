@@ -1,0 +1,62 @@
+<app-layout pageTitle="Reports" [navItems]="nav" roleLabel="Supplier Portal">
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon bg-green">✅</div>
+      <div class="stat-info"><h3>{{ orders.length }}</h3><p>Delivered Orders</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon bg-blue">💰</div>
+      <div class="stat-info"><h3>₹{{ totalRevenue | number:'1.0-0' }}</h3><p>Total Revenue</p></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon bg-purple">📦</div>
+      <div class="stat-info"><h3>{{ totalItems }}</h3><p>Total Line Items</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📈 Delivered Orders Report</div>
+    <div *ngIf="loading" class="empty-state"><div class="empty-icon">⏳</div><p>Loading…</p></div>
+    <div *ngIf="!loading && orders.length === 0" class="empty-state">
+      <div class="empty-icon">📭</div><p>No delivered orders yet</p>
+    </div>
+    <div class="table-wrap" *ngIf="!loading && orders.length > 0">
+      <table>
+        <thead>
+          <tr><th>Order ID</th><th>Retailer</th><th>Order Date</th><th>Delivered</th><th>Items</th><th>Revenue</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let o of orders">
+            <td>#{{ o.id }}</td>
+            <td>{{ o.retailerEmail || '—' }}</td>
+            <td>{{ o.orderDate | date:'dd MMM yyyy' }}</td>
+            <td>{{ o.deliveredDate ? (o.deliveredDate | date:'dd MMM yyyy') : '—' }}</td>
+            <td>{{ o.items?.length ?? 0 }}</td>
+            <td>₹{{ (o.totalAmount ?? 0) | number:'1.0-0' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Per-order item breakdown -->
+  <div class="card" *ngFor="let o of orders.slice(0,5)">
+    <div class="card-title">Order #{{ o.id }} — {{ o.retailerEmail }}</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Product</th><th>Qty</th><th>Unit</th><th>Price</th><th>Subtotal</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let item of o.items">
+            <td>{{ item.productName }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.unit || '—' }}</td>
+            <td>₹{{ item.price }}</td>
+            <td>₹{{ (item.price * item.quantity) | number:'1.0-0' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</app-layout>

@@ -1,0 +1,6 @@
+.top-products { display:flex; flex-direction:column; gap:12px; }
+.tp-row { display:flex; align-items:center; gap:12px; }
+.tp-name { width:120px; font-size:13px; font-weight:500; }
+.tp-bar-out { flex:1; height:12px; background:#f0f2f5; border-radius:6px; overflow:hidden; }
+.tp-bar-in  { height:100%; border-radius:6px; transition:width .5s; }
+.tp-val { width:36px; font-size:12px; color:#888; text-align:right; }

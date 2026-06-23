@@ -1,0 +1,30 @@
+<app-layout pageTitle="My Ratings" [navItems]="nav" roleLabel="Supplier Portal">
+  <div class="card">
+    <div class="card-title">⭐ My Performance Rating</div>
+    <div class="rating-overview">
+      <div class="big-rating">
+        <span class="big-num">{{ avgRating }}</span>
+        <div class="stars">{{ '★'.repeat(Math.round(avgRating))+'☆'.repeat(5-Math.round(avgRating)) }}</div>
+        <span style="font-size:13px;color:#888">Based on {{ ratings.length }} reviews</span>
+      </div>
+      <div class="rating-dist">
+        <div class="dist-row" *ngFor="let n of [5,4,3,2,1]">
+          <span class="dist-num">{{ n }}★</span>
+          <div class="dist-bar-outer"><div class="dist-bar-inner" [style.width.%]="dist(n)"></div></div>
+          <span class="dist-pct">{{ dist(n) }}%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ratings-list">
+    <div class="rating-card" *ngFor="let r of ratings">
+      <div class="rating-header">
+        <div class="rater-avatar">{{ r.retailerEmail?.charAt(0).toUpperCase() }}</div>
+        <div><div class="rater-name">{{ r.retailerEmail }}</div><div class="stars" style="font-size:15px">{{ stars(r.rating) }}</div></div>
+        <div class="rating-date">{{ r.createdAt | date:'dd MMM yyyy' }}</div>
+      </div>
+      <p class="review-text">{{ r.review }}</p>
+    </div>
+    <div *ngIf="ratings.length===0" class="empty-state card"><div class="empty-icon">⭐</div><p>No ratings yet</p></div>
+  </div>
+</app-layout>

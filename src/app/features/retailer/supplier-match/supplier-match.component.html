@@ -1,0 +1,46 @@
+<app-layout pageTitle="Supplier Match" [navItems]="nav" roleLabel="Retailer Portal">
+  <div class="card">
+    <div class="section-header">
+      <h2>🤝 Find Relevant Suppliers</h2>
+    </div>
+    <div class="match-toolbar">
+      <input type="text" [(ngModel)]="searchProduct" placeholder="Search by product (e.g. Rice, Flour…)" (keyup.enter)="search()">
+      <button class="btn-primary" style="width:auto;padding:9px 20px" (click)="search()">🔍 Search</button>
+      <select [(ngModel)]="sortBy" (change)="apply()">
+        <option value="price">Sort: Best Price</option>
+        <option value="rating">Sort: Top Rated</option>
+        <option value="stock">Sort: Most Stock</option>
+      </select>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="empty-state card"><div class="empty-icon">🔍</div><p>Searching suppliers…</p></div>
+
+  <div *ngIf="!loading && filtered.length === 0" class="empty-state card">
+    <div class="empty-icon">🤷</div><p>No matching suppliers found. Try a different product name.</p>
+  </div>
+
+  <div class="match-grid">
+    <div class="match-card" *ngFor="let m of filtered">
+      <div class="match-header">
+        <div class="supplier-avatar">{{ m.supplierName?.charAt(0) }}</div>
+        <div>
+          <div class="supplier-name">{{ m.supplierName }}</div>
+          <div class="business-name">{{ m.businessName }}</div>
+        </div>
+      </div>
+      <div class="match-product">📦 {{ m.productName }}</div>
+      <div class="match-stats">
+        <div class="mstat"><span class="mstat-val">₹{{ m.price }}</span><span class="mstat-lbl">Per Unit</span></div>
+        <div class="mstat"><span class="mstat-val">{{ m.moq }}</span><span class="mstat-lbl">Min Order</span></div>
+        <div class="mstat"><span class="mstat-val">{{ m.stockQuantity }}</span><span class="mstat-lbl">In Stock</span></div>
+        <div class="mstat"><span class="mstat-val">{{ m.leadTime }}d</span><span class="mstat-lbl">Lead Time</span></div>
+      </div>
+      <div class="match-rating">
+        <span class="stars">{{ stars(m.rating) }}</span>
+        <span class="rating-num">{{ m.rating }}/5</span>
+      </div>
+      <button class="btn-primary" style="margin-top:12px">📩 Contact Supplier</button>
+    </div>
+  </div>
+</app-layout>

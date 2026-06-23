@@ -1,0 +1,42 @@
+<app-layout pageTitle="Order Details" [navItems]="nav" roleLabel="Retailer Portal">
+  <div class="card">
+    <div class="section-header">
+      <h2>🛒 My Orders</h2>
+    </div>
+    <div class="filter-bar">
+      <select [(ngModel)]="filterStatus" (change)="apply()">
+        <option value="">All Status</option>
+        <option>PENDING</option><option>ACCEPTED</option>
+        <option>DISPATCHED</option><option>DELIVERED</option><option>CANCELLED</option>
+      </select>
+    </div>
+    <div *ngIf="loading" class="empty-state"><div class="empty-icon">⏳</div><p>Loading…</p></div>
+    <div class="table-wrap" *ngIf="!loading">
+      <table>
+        <thead><tr><th>#</th><th>Order ID</th><th>Supplier</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let o of filtered; let i=index">
+            <td>{{ i+1 }}</td>
+            <td>#{{ o.id }}</td>
+            <td>{{ o.supplierEmail || '—' }}</td>
+            <td><span class="badge" [class]="'badge-' + o.status.toLowerCase()">{{ o.status }}</span></td>
+            <td>{{ o.orderDate | date:'dd MMM yyyy' }}</td>
+            <td><button class="btn-sm btn-info" (click)="viewOrder(o)">View</button></td>
+          </tr>
+          <tr *ngIf="filtered.length === 0"><td colspan="6"><div class="empty-state"><div class="empty-icon">📭</div><p>No orders</p></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="selected" (click)="closeDetail()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Order #{{ selected.id }} Details</h3>
+      <p><strong>Supplier:</strong> {{ selected.supplierEmail || '—' }}</p>
+      <p><strong>Status:</strong> <span class="badge" [class]="'badge-' + selected.status.toLowerCase()">{{ selected.status }}</span></p>
+      <p><strong>Order Date:</strong> {{ selected.orderDate | date:'dd MMM yyyy HH:mm' }}</p>
+      <p *ngIf="selected.deliveredDate"><strong>Delivered:</strong> {{ selected.deliveredDate | date:'dd MMM yyyy' }}</p>
+      <div class="modal-footer"><button class="btn-secondary" (click)="closeDetail()">Close</button></div>
+    </div>
+  </div>
+</app-layout>

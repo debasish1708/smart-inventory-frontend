@@ -1,0 +1,56 @@
+<app-layout pageTitle="Supplier Dashboard" [navItems]="nav" roleLabel="Supplier Portal">
+
+  <div *ngIf="!profileCompleted" class="pending-banner">
+    <div class="icon">📋</div>
+    <h3>Complete Your Profile First</h3>
+    <p>Fill in your business details to start receiving orders.</p>
+    <a routerLink="/supplier/profile" class="btn-primary" style="display:inline-block;width:auto;padding:10px 28px;margin-top:14px;text-decoration:none">Complete Profile →</a>
+  </div>
+
+  <div *ngIf="profileCompleted && userStatus==='PENDING'" class="pending-banner" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);border-color:#1976d2">
+    <div class="icon">⏳</div>
+    <h3 style="color:#0d47a1">Awaiting Admin Approval</h3>
+    <p style="color:#1565c0">Your account is under review. You'll be notified once approved.</p>
+  </div>
+
+  <ng-container *ngIf="profileCompleted && userStatus==='ACTIVE'">
+    <div class="welcome-msg">
+      <h2>Welcome, {{ userName }}! 🏭</h2>
+      <p>Here's your supplier performance summary.</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon bg-blue">🏭</div><div class="stat-info"><h3>{{ stats.inventory }}</h3><p>Product Listings</p></div></div>
+      <div class="stat-card"><div class="stat-icon bg-green">📋</div><div class="stat-info"><h3>{{ stats.orders }}</h3><p>Total Orders</p></div></div>
+      <div class="stat-card"><div class="stat-icon bg-orange">⏳</div><div class="stat-info"><h3>{{ stats.pendingOrders }}</h3><p>Pending Orders</p></div></div>
+      <div class="stat-card"><div class="stat-icon bg-purple">⭐</div><div class="stat-info"><h3>{{ stats.avgRating || '—' }}</h3><p>Avg Rating</p></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 Recent Orders</div>
+      <div *ngIf="recentOrders.length===0" class="empty-state"><div class="empty-icon">📭</div><p>No orders yet</p></div>
+      <table *ngIf="recentOrders.length>0">
+        <thead><tr><th>Order ID</th><th>Retailer</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let o of recentOrders">
+            <td>#{{ o.id }}</td>
+            <td>{{ o.retailerEmail||'—' }}</td>
+            <td><span class="badge" [class]="'badge-'+o.status.toLowerCase()">{{ o.status }}</span></td>
+            <td>{{ o.orderDate | date:'dd MMM' }}</td>
+            <td><a routerLink="/supplier/orders" class="btn-sm btn-info">Manage</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚡ Quick Actions</div>
+      <div class="quick-actions">
+        <a routerLink="/supplier/inventory"  class="quick-btn">🏭 My Listings</a>
+        <a routerLink="/supplier/orders"     class="quick-btn">📋 Manage Orders</a>
+        <a routerLink="/supplier/analytics"  class="quick-btn">📊 Analytics</a>
+        <a routerLink="/supplier/report"     class="quick-btn">📈 Reports</a>
+      </div>
+    </div>
+  </ng-container>
+</app-layout>

@@ -1,0 +1,30 @@
+<app-layout pageTitle="Admin Dashboard" [navItems]="nav" roleLabel="Admin Panel">
+  <div class="welcome">
+    <h2>👑 Admin Control Panel</h2>
+    <p>Manage your platform users, monitor activity, and approve registrations.</p>
+  </div>
+
+  <div class="stats-grid" *ngIf="stats">
+    <div class="stat-card"><div class="stat-icon bg-blue">👥</div><div class="stat-info"><h3>{{ stats.total }}</h3><p>Total Users</p></div></div>
+    <div class="stat-card"><div class="stat-icon bg-green">✅</div><div class="stat-info"><h3>{{ stats.active }}</h3><p>Active Users</p></div></div>
+    <div class="stat-card"><div class="stat-icon bg-orange">⏳</div><div class="stat-info"><h3>{{ stats.pending }}</h3><p>Pending Approval</p></div></div>
+    <div class="stat-card"><div class="stat-icon bg-red">🚫</div><div class="stat-info"><h3>{{ stats.blocked }}</h3><p>Blocked</p></div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚡ Quick Actions</div>
+    <div class="quick-actions">
+      <a routerLink="/admin/retailers" class="quick-btn">🏪 Manage Retailers</a>
+      <a routerLink="/admin/suppliers"  class="quick-btn">🏭 Manage Suppliers</a>
+      <a routerLink="/admin/analytics"  class="quick-btn">📊 Platform Analytics</a>
+    </div>
+  </div>
+
+  <div class="card" *ngIf="stats?.pending > 0">
+    <div class="card-title">🔔 Pending Approvals</div>
+    <div class="alert alert-warning">
+      There are <strong>{{ stats.pending }}</strong> user(s) awaiting approval.
+      <a routerLink="/admin/retailers" style="color:#1565c0;font-weight:600;margin-left:8px">Review Now →</a>
+    </div>
+  </div>
+</app-layout>

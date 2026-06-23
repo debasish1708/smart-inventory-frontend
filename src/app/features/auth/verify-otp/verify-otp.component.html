@@ -1,0 +1,20 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="brand">
+      <div style="font-size:48px;margin-bottom:8px">📧</div>
+      <h1>Verify Your Email</h1>
+      <p>Enter the 6-digit OTP sent to<br><strong>{{ email }}</strong></p>
+    </div>
+    <div *ngIf="error"   class="alert alert-error">{{ error }}</div>
+    <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+    <div class="otp-inputs" #otpContainer></div>
+    <div class="resend-row">
+      <span *ngIf="timer > 0">Resend in <strong style="color:#1565c0">{{ timer }}s</strong></span>
+      <span *ngIf="timer === 0">Didn't receive it? <a href="#" (click)="resend($event)">Resend OTP</a></span>
+    </div>
+    <button class="btn-primary" (click)="verify()" [disabled]="loading">
+      <span *ngIf="loading" class="spinner"></span>{{ loading?'Verifying…':'Verify OTP' }}
+    </button>
+    <div class="auth-link"><a routerLink="/auth/login">← Back to Login</a></div>
+  </div>
+</div>

@@ -1,0 +1,22 @@
+.welcome-msg { margin-bottom: 20px; }
+.welcome-msg h2 { font-size: 20px; font-weight: 700; color: #1a1a2e; }
+.welcome-msg p  { color: #666; font-size: 14px; margin-top: 4px; }
+
+.notif-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid #f0f2f5; font-size: 13px;
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-icon { font-size: 16px; flex-shrink: 0; }
+.notif-msg  { color: #555; line-height: 1.5; }
+
+.quick-actions {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 12px;
+}
+.quick-btn {
+  display: block; padding: 14px 16px; background: #f5f7fa;
+  border-radius: 10px; text-decoration: none; color: #1a1a2e;
+  font-size: 13.5px; font-weight: 500; text-align: center;
+  transition: background .2s, transform .2s;
+}
+.quick-btn:hover { background: #e3f2fd; color: #1565c0; transform: translateY(-2px); }

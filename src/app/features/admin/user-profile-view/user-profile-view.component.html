@@ -1,0 +1,48 @@
+<app-layout pageTitle="User Profile Detail" [navItems]="nav" roleLabel="Admin Panel">
+  <div class="back-bar">
+    <button class="btn-secondary" (click)="goBack()">← Back</button>
+  </div>
+
+  <div *ngIf="loading" class="empty-state card"><div class="empty-icon">⏳</div><p>Loading profile…</p></div>
+
+  <ng-container *ngIf="!loading && profile">
+    <div class="card profile-hero">
+      <div class="hero-avatar" [class]="profile.role==='SUPPLIER'?'avatar-supplier':'avatar-retailer'">
+        {{ (profile.firstName ? profile.firstName[0] : profile.email[0]).toUpperCase() }}
+      </div>
+      <div class="hero-info">
+        <h2>{{ profile.firstName ? profile.firstName+' '+profile.lastName : '—' }}</h2>
+        <div class="hero-email">{{ profile.email }}</div>
+        <div class="hero-tags">
+          <span class="badge" [class]="profile.role==='SUPPLIER'?'badge-supplier':'badge-retailer'">{{ profile.role }}</span>
+          <span class="badge" [class]="'badge-'+profile.userStatus.toLowerCase()">{{ profile.userStatus }}</span>
+          <span *ngIf="profile.profileCompleted" style="font-size:12px;color:#2e7d32;font-weight:600">✓ Profile Complete</span>
+          <span *ngIf="!profile.profileCompleted" style="font-size:12px;color:#e65100;font-weight:600">⚠ Profile Incomplete</span>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <div *ngIf="toast" class="alert" [class]="toastType==='success'?'alert-success':'alert-warning'" style="margin-bottom:10px">{{ toast }}</div>
+        <button *ngIf="profile.userStatus!=='ACTIVE'"  class="btn-sm btn-success" (click)="approve()">✓ Approve Account</button>
+        <button *ngIf="profile.userStatus==='ACTIVE'"  class="btn-sm btn-warn"    (click)="block()">🚫 Block Account</button>
+      </div>
+    </div>
+
+    <div class="card" *ngIf="profile.profileCompleted">
+      <div class="card-title">📋 Business Information</div>
+      <div class="info-grid">
+        <div class="info-item"><span class="info-label">Business Name</span><span class="info-val">{{ profile.businessName||'—' }}</span></div>
+        <div class="info-item"><span class="info-label">Business Type</span><span class="info-val">{{ profile.businessType||'—' }}</span></div>
+        <div class="info-item"><span class="info-label">Mobile</span><span class="info-val">{{ profile.mobNo||'—' }}</span></div>
+        <div class="info-item"><span class="info-label">GST Number</span><span class="info-val">{{ profile.gst||'—' }}</span></div>
+        <div class="info-item full-width"><span class="info-label">Address</span><span class="info-val">{{ profile.address||'—' }}</span></div>
+        <div class="info-item"><span class="info-label">City</span><span class="info-val">{{ profile.city||'—' }}</span></div>
+        <div class="info-item"><span class="info-label">State</span><span class="info-val">{{ profile.state||'—' }}</span></div>
+        <div class="info-item"><span class="info-label">Pincode</span><span class="info-val">{{ profile.pincode||'—' }}</span></div>
+      </div>
+    </div>
+
+    <div class="card" *ngIf="!profile.profileCompleted">
+      <div class="alert alert-warning">This user has not completed their profile yet. You can still approve or block the account.</div>
+    </div>
+  </ng-container>
+</app-layout>
