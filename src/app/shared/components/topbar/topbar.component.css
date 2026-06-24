@@ -8,7 +8,7 @@
   box-shadow: 0 1px 6px rgba(0,0,0,0.08);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 200;
   border-bottom: 1px solid #f0f2f5;
 }
 
@@ -18,12 +18,17 @@
   color: #1a1a2e;
 }
 
+/* ── User area wrapper (relative so dropdown can be positioned inside) ── */
 .user-area {
   display: flex;
   align-items: center;
   gap: 12px;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
 }
 
+/* ── Avatar circle ── */
 .avatar {
   width: 38px;
   height: 38px;
@@ -36,8 +41,15 @@
   font-weight: 700;
   font-size: 14px;
   flex-shrink: 0;
+  transition: box-shadow 0.2s, transform 0.15s;
 }
 
+.avatar:hover {
+  box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.35);
+  transform: scale(1.06);
+}
+
+/* ── Inline user info strip ── */
 .user-info {
   display: flex;
   flex-direction: column;
@@ -50,6 +62,7 @@
   font-weight: 500;
 }
 
+/* ── Role chip (shared between strip & dropdown) ── */
 .role-chip {
   font-size: 10px;
   font-weight: 700;
@@ -61,5 +74,96 @@
 }
 
 .role-retailer { background: #e3f2fd; color: #1565c0; }
-.role-supplier { background: #f3e5f5; color: #6a1b9a; }
-.role-admin    { background: #fce4ec; color: #ad1457; }
+.role-supplier  { background: #f3e5f5; color: #6a1b9a; }
+.role-admin     { background: #fce4ec; color: #ad1457; }
+
+/* ── Dropdown card ── */
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 260px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid #f0f2f5;
+  z-index: 500;
+  overflow: hidden;
+  animation: dropIn 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+
+/* ── Dropdown header section ── */
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 18px 14px;
+}
+
+.dropdown-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1565c0, #42a5f5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.dropdown-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow: hidden;
+}
+
+.dropdown-email {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a2e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Divider ── */
+.dropdown-divider {
+  height: 1px;
+  background: #f0f2f5;
+  margin: 0;
+}
+
+/* ── Logout button ── */
+.dropdown-logout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 18px;
+  border: none;
+  background: transparent;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #e53935;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-align: left;
+}
+
+.dropdown-logout:hover {
+  background: #fff5f5;
+}
+
+.dropdown-logout svg {
+  flex-shrink: 0;
+  color: #e53935;
+}
