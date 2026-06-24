@@ -17,7 +17,7 @@
             <td>₹{{ item.price | number:'1.2-2' }}</td>
             <td>{{ item.moq }}</td>
             <td>{{ item.stockQuantity }}</td>
-            <td>{{ item.leadTime }}d</td>
+            <td>{{ item.leadTime }} days<br><small style="color:#1e3a8a; font-weight: 600;">📅 {{ getAvailabilityDate(item.leadTime) | date:'dd MMM yyyy' }}</small></td>
             <td><span class="badge" [class]="item.isActive?'badge-active':'badge-blocked'">{{ item.isActive?'Active':'Inactive' }}</span></td>
             <td><div class="actions"><button class="btn-sm btn-info" (click)="openEdit(item)">✏️</button><button class="btn-sm btn-danger" (click)="delete(item.id)">🗑</button></div></td>
           </tr>
@@ -39,7 +39,13 @@
         <div class="form-group"><label>Stock Quantity *</label><input type="number" [(ngModel)]="form.stockQuantity"></div>
         <div class="form-group"><label>Unit</label><input [(ngModel)]="form.unit" placeholder="kg / pcs / litre"></div>
         <div class="form-group"><label>Brand</label><input [(ngModel)]="form.brand"></div>
-        <div class="form-group"><label>Lead Time (days)</label><input type="number" [(ngModel)]="form.leadTime"></div>
+        <div class="form-group">
+          <label>Lead Time (days) *</label>
+          <input type="number" [(ngModel)]="form.leadTime">
+          <small style="font-size: 11px; color: #2563eb; display: block; margin-top: 4px; font-weight: 600;">
+            📅 Preview: Available by {{ calculatedAvailabilityPreview | date:'dd MMM yyyy' }}
+          </small>
+        </div>
       </div>
       <div class="form-group" style="margin-top:8px">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer">

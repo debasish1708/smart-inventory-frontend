@@ -4,7 +4,7 @@
     <div class="rating-overview">
       <div class="big-rating">
         <span class="big-num">{{ avgRating }}</span>
-        <div class="stars">{{ '★'.repeat(Math.round(avgRating))+'☆'.repeat(5-Math.round(avgRating)) }}</div>
+        <div class="stars">{{ stars(avgRating) }}</div>
         <span style="font-size:13px;color:#888">Based on {{ ratings.length }} reviews</span>
       </div>
       <div class="rating-dist">

@@ -43,6 +43,40 @@
       </div>
     </div>
 
+    <!-- Low Stock warning banner -->
+    <div class="card low-stock-banner" *ngIf="lowStockItems.length > 0" style="border: 1.5px solid #ef4444; background: #fff5f5; border-radius: 12px; margin-bottom: 24px; padding: 20px;">
+      <div class="card-title" style="color: #b91c1c; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        ⚠️ Stock Shortages Action Panel
+      </div>
+      <p style="font-size: 13px; color: #7f1d1d; margin-bottom: 14px;">
+        These products are low on stock. Click below to compare prices, MOQ, and ratings using our smart matching algorithm.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr style="background: #ffe4e6;">
+              <th style="color: #991b1b;">Product Name</th>
+              <th style="color: #991b1b;">Current Stock</th>
+              <th style="color: #991b1b;">Threshold</th>
+              <th style="color: #991b1b;">Smart Option</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of lowStockItems" style="border-bottom: 1px solid #fee2e2;">
+              <td><strong style="color: #7f1d1d;">{{ item.productName }}</strong></td>
+              <td style="color: #b91c1c; font-weight: 700;">{{ item.quantity }} {{ item.unit || 'units' }}</td>
+              <td style="color: #4b5563;">{{ item.thresholdValue }}</td>
+              <td>
+                <a [routerLink]="['/retailer/supplier-match']" [queryParams]="{ search: item.productName }" class="btn-sm btn-danger" style="text-decoration: none; display: inline-block;">
+                  💡 Find Best Supplier
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <div class="grid-2">
       <!-- Recent Orders -->
       <div class="card">

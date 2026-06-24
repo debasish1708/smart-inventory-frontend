@@ -1,4 +1,4 @@
-<app-layout pageTitle="Analytics" [navItems]="nav" roleLabel="Retailer Portal">
+<app-layout pageTitle="Analytics & Growth" [navItems]="nav" roleLabel="Retailer Portal">
   <div *ngIf="loading" class="empty-state card"><div class="empty-icon">⏳</div><p>Loading analytics…</p></div>
 
   <ng-container *ngIf="!loading">
@@ -17,18 +17,87 @@
       </div>
       <div class="stat-card">
         <div class="stat-icon bg-purple">📈</div>
-        <div class="stat-info"><h3>{{ summary.monthlyGrowth | number:'1.0-1' }}%</h3><p>Growth</p></div>
+        <div class="stat-info"><h3>{{ summary.monthlyGrowth | number:'1.0-1' }}%</h3><p>Last Month Growth</p></div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title">📦 Inventory Health</div>
-      <div class="health-row">
-        <div class="health-item"><span class="dot green"></span> In Stock: {{ inventoryStats.ok }} items ({{ pct(inventoryStats.ok) }}%)</div>
-        <div class="health-item"><span class="dot orange"></span> Low Stock: {{ inventoryStats.low }} items ({{ pct(inventoryStats.low) }}%)</div>
-        <div class="health-item"><span class="dot red"></span> Out of Stock: {{ inventoryStats.out }} items ({{ pct(inventoryStats.out) }}%)</div>
+    <!-- Monthly growth report chart and neighborhood demand columns -->
+    <div class="grid-2" style="margin-bottom: 24px;">
+      
+      <!-- Growth Report Card -->
+      <div class="card" style="margin-bottom: 0;">
+        <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+          📈 Sales & Monthly Growth Report
+        </div>
+        <p style="font-size: 12.5px; color: #64748b;">Monthly breakdown of sales revenue with month-over-month growth rate percentage.</p>
+        
+        <div class="bar-chart" style="display: flex; align-items: flex-end; justify-content: space-around; height: 160px; padding: 25px 10px 10px; background: #f8fafc; border-radius: 12px; margin-top: 20px; border: 1px solid #edf2f7;">
+          <div class="bar-wrap" *ngFor="let t of monthlyGrowthTrend" style="display: flex; flex-direction: column; align-items: center; flex: 1; position: relative;">
+            <!-- Tooltip value -->
+            <span style="font-size: 10px; font-weight: 700; color: #1e3a8a; margin-bottom: 2px;">₹{{ t.sales | number:'1.0-0' }}</span>
+            <!-- CSS bar -->
+            <div class="bar" [style.height.px]="barHeight(t.sales)" style="width: 24px; background: linear-gradient(to top, #1565c0, #42a5f5); border-radius: 4px 4px 0 0; transition: height .4s ease; min-height: 4px;"></div>
+            <!-- Labels -->
+            <span style="font-size: 10.5px; color: #475569; font-weight: 600; margin-top: 4px;">{{ t.month }}</span>
+            <span [style.color]="t.growth >= 0 ? '#10b981' : '#ef4444'" style="font-size: 9px; font-weight: 750;">
+              {{ t.growth > 0 ? '+' : '' }}{{ t.growth !== 0 ? t.growth + '%' : '—' }}
+            </span>
+          </div>
+        </div>
       </div>
-      <div class="health-bar-outer" *ngIf="totalInv > 1">
+
+      <!-- Area Demand Card -->
+      <div class="card" style="margin-bottom: 0;">
+        <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+          📍 Neighborhood Demand Trends
+        </div>
+        <p style="font-size: 12.5px; color: #64748b;">Trending products based on active retail purchases in <strong>{{ userCity }}</strong>.</p>
+        
+        <div class="table-wrap" style="margin-top: 15px;">
+          <table>
+            <thead>
+              <tr style="background: #f8fafc;">
+                <th style="font-size: 12px; font-weight: 700; color: #475569;">Product</th>
+                <th style="font-size: 12px; font-weight: 700; color: #475569;">Demand Index</th>
+                <th style="font-size: 12px; font-weight: 700; color: #475569;">Market Trend</th>
+                <th style="font-size: 12px; font-weight: 700; color: #475569;">Avg Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let d of regionalDemand">
+                <td><strong>{{ d.productName }}</strong></td>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="flex: 1; background: #e2e8f0; height: 5px; border-radius: 10px; min-width: 50px;">
+                      <div [style.width.%]="d.demandScore" style="background: #2563eb; height: 100%; border-radius: 10px;"></div>
+                    </div>
+                    <span style="font-weight: 700; font-size: 12px; color: #1e3a8a;">{{ d.demandScore }}%</span>
+                  </div>
+                </td>
+                <td>
+                  <span [style.background]="d.trend === 'UP' ? '#ecfdf5' : (d.trend === 'DOWN' ? '#fef2f2' : '#f1f5f9')"
+                        [style.color]="d.trend === 'UP' ? '#047857' : (d.trend === 'DOWN' ? '#b91c1c' : '#475569')"
+                        style="padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 750;">
+                    {{ d.trend }}
+                  </span>
+                </td>
+                <td style="font-weight: 600; color: #1e293b;">₹{{ d.avgPrice }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventory Health -->
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="card-title">📦 Inventory Health Status</div>
+      <div class="health-row" style="display: flex; gap: 20px; margin-bottom: 12px; flex-wrap: wrap;">
+        <div class="health-item" style="display: flex; align-items: center; gap: 6px; font-size: 13.5px;"><span class="dot green" style="width:10px;height:10px;background:#43a047;border-radius:50%;display:inline-block"></span> In Stock: {{ inventoryStats.ok }} items ({{ pct(inventoryStats.ok) }}%)</div>
+        <div class="health-item" style="display: flex; align-items: center; gap: 6px; font-size: 13.5px;"><span class="dot orange" style="width:10px;height:10px;background:#ff9800;border-radius:50%;display:inline-block"></span> Low Stock: {{ inventoryStats.low }} items ({{ pct(inventoryStats.low) }}%)</div>
+        <div class="health-item" style="display: flex; align-items: center; gap: 6px; font-size: 13.5px;"><span class="dot red" style="width:10px;height:10px;background:#e53935;border-radius:50%;display:inline-block"></span> Out of Stock: {{ inventoryStats.out }} items ({{ pct(inventoryStats.out) }}%)</div>
+      </div>
+      <div class="health-bar-outer" style="height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden; display: flex;" *ngIf="totalInv > 1">
         <div class="health-segment" [style.width.%]="pct(inventoryStats.ok)"  style="background:#43a047"></div>
         <div class="health-segment" [style.width.%]="pct(inventoryStats.low)" style="background:#ff9800"></div>
         <div class="health-segment" [style.width.%]="pct(inventoryStats.out)" style="background:#e53935"></div>
@@ -36,12 +105,12 @@
       <div *ngIf="totalInv === 1" class="alert alert-info" style="margin-top:12px">Add inventory items to see health breakdown.</div>
     </div>
 
+    <!-- Context Info -->
     <div class="card">
-      <div class="card-title">ℹ️ About Analytics</div>
+      <div class="card-title">ℹ️ Smart Analytics & Growth Reports</div>
       <p style="font-size:13.5px;color:#666;line-height:1.7">
-        Revenue and order counts are calculated from your delivered orders in real time from the database.
-        The top product is the item with the highest total quantity ordered across all your orders.
-        Inventory health reflects your current live stock levels.
+        Monthly growth indexes are sync'd in real time with your database transactions, representing the performance shifts. 
+        Area demand calculations leverage local retailers' purchase frequencies to determine market demand for each category.
       </p>
     </div>
   </ng-container>

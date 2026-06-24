@@ -18,6 +18,7 @@ export class RetailerDashboardComponent implements OnInit {
   stats = { inventory: 0, orders: 0, lowStock: 0, pendingOrders: 0 };
   recentOrders: any[] = [];
   notifications: any[] = [];
+  lowStockItems: any[] = [];
   loading = true;
 
   constructor(private retailerSvc: RetailerService, private auth: AuthService) {}
@@ -39,7 +40,8 @@ export class RetailerDashboardComponent implements OnInit {
       next: r => {
         if (r.success) {
           this.stats.inventory = r.data.length;
-          this.stats.lowStock = r.data.filter((i: any) => i.quantity <= (i.thresholdValue ?? 10)).length;
+          this.lowStockItems = r.data.filter((i: any) => i.quantity <= (i.thresholdValue ?? 10));
+          this.stats.lowStock = this.lowStockItems.length;
         }
         this.loading = false;
       },

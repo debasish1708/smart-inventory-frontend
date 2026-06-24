@@ -3,14 +3,30 @@
     <div class="section-header">
       <h2>🤝 Find Relevant Suppliers</h2>
     </div>
-    <div class="match-toolbar">
-      <input type="text" [(ngModel)]="searchProduct" placeholder="Search by product (e.g. Rice, Flour…)" (keyup.enter)="search()">
+    <div class="match-toolbar" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+      <input type="text" [(ngModel)]="searchProduct" placeholder="Search by product (e.g. Rice, Flour…)" (keyup.enter)="search()" style="flex: 1; min-width: 200px;">
       <button class="btn-primary" style="width:auto;padding:9px 20px" (click)="search()">🔍 Search</button>
-      <select [(ngModel)]="sortBy" (change)="apply()">
-        <option value="price">Sort: Best Price</option>
+      <select [(ngModel)]="sortBy" (change)="apply()" style="padding: 8px 12px; border: 1.5px solid #d0d5dd; border-radius: 8px; font-size: 13px;">
+        <option value="smart">Sort: Smart Suggestion</option>
+        <option value="price">Sort: Best Price (Per Unit)</option>
         <option value="rating">Sort: Top Rated</option>
         <option value="stock">Sort: Most Stock</option>
       </select>
+    </div>
+  </div>
+
+  <!-- Smart Suggestion Highlighting Banner -->
+  <div class="card smart-suggestion-banner" *ngIf="!loading && bestMatch" style="border: 2px solid #10b981; background: #ecfdf5; border-radius: 14px; margin-bottom: 24px; padding: 22px; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.1);">
+    <div class="badge badge-active" style="background: #10b981; color: white; margin-bottom: 12px; font-size: 11px; padding: 4px 10px; border-radius: 20px;">🏆 RECOMMENDED BEST SUPPLIER</div>
+    <h3 style="color: #065f46; font-size: 18px; font-weight: 800; margin-bottom: 8px;">
+      Empowered Suggestion: {{ bestMatch.supplierName }}
+    </h3>
+    <p style="font-size: 13.5px; color: #047857; line-height: 1.65; margin-bottom: 14px;">
+      Recommended choice for <strong>{{ bestMatch.productName }}</strong>. It delivers the most optimized entry order cost of <strong>₹{{ bestMatch.minOrderCost | number:'1.0-0' }}</strong> (Price: ₹{{ bestMatch.price }} * MOQ: {{ bestMatch.moq }}), high rating of <strong>{{ bestMatch.rating }} ★</strong>, and immediate availability by <strong>{{ bestMatch.availabilityDate | date:'dd MMM yyyy' }}</strong> ({{ bestMatch.leadTime }} day lead time).
+    </p>
+    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+      <span style="font-size: 12px; font-weight: 750; color: #065f46; background: #d1fae5; padding: 5px 12px; border-radius: 20px; border: 1px solid #a7f3d0;">Match Index: {{ bestMatch.recommendationScore }}%</span>
+      <button class="btn-sm btn-success" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;">📩 Place Order</button>
     </div>
   </div>
 
@@ -20,27 +36,35 @@
     <div class="empty-icon">🤷</div><p>No matching suppliers found. Try a different product name.</p>
   </div>
 
-  <div class="match-grid">
-    <div class="match-card" *ngFor="let m of filtered">
-      <div class="match-header">
-        <div class="supplier-avatar">{{ m.supplierName?.charAt(0) }}</div>
+  <div class="match-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+    <div class="match-card" *ngFor="let m of filtered" [style.border]="m === bestMatch ? '2px solid #10b981' : '1px solid #e5e7eb'" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative;">
+      <div *ngIf="m === bestMatch" style="position: absolute; top: -12px; right: 15px; background: #10b981; color: white; padding: 3px 10px; font-size: 10px; font-weight: 750; border-radius: 20px; text-transform: uppercase;">Best Match</div>
+      <div class="match-header" style="display: flex; gap: 12px; align-items: center; margin-bottom: 14px;">
+        <div class="supplier-avatar" style="width: 44px; height: 44px; border-radius: 50%; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">{{ m.supplierName?.charAt(0) }}</div>
         <div>
-          <div class="supplier-name">{{ m.supplierName }}</div>
-          <div class="business-name">{{ m.businessName }}</div>
+          <div class="supplier-name" style="font-weight: 700; color: #1e293b; font-size: 15px;">{{ m.supplierName }}</div>
+          <div class="business-name" style="color: #64748b; font-size: 12px;">{{ m.businessName }}</div>
         </div>
       </div>
-      <div class="match-product">📦 {{ m.productName }}</div>
-      <div class="match-stats">
-        <div class="mstat"><span class="mstat-val">₹{{ m.price }}</span><span class="mstat-lbl">Per Unit</span></div>
-        <div class="mstat"><span class="mstat-val">{{ m.moq }}</span><span class="mstat-lbl">Min Order</span></div>
-        <div class="mstat"><span class="mstat-val">{{ m.stockQuantity }}</span><span class="mstat-lbl">In Stock</span></div>
-        <div class="mstat"><span class="mstat-val">{{ m.leadTime }}d</span><span class="mstat-lbl">Lead Time</span></div>
+      <div class="match-product" style="font-weight: 600; color: #1e3a8a; font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 4px;">📦 {{ m.productName }}</div>
+      
+      <div class="match-stats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+        <div class="mstat" style="display: flex; flex-direction: column; background: #f8fafc; padding: 6px 10px; border-radius: 6px;"><span class="mstat-val" style="font-weight: 700; color: #334155; font-size: 13.5px;">₹{{ m.price }}</span><span class="mstat-lbl" style="font-size: 10px; color: #94a3b8;">Per Unit</span></div>
+        <div class="mstat" style="display: flex; flex-direction: column; background: #f8fafc; padding: 6px 10px; border-radius: 6px;"><span class="mstat-val" style="font-weight: 700; color: #334155; font-size: 13.5px;">{{ m.moq }} units</span><span class="mstat-lbl" style="font-size: 10px; color: #94a3b8;">Min Order (MOQ)</span></div>
+        <div class="mstat" style="display: flex; flex-direction: column; background: #ecfdf5; padding: 6px 10px; border-radius: 6px; grid-column: span 2; border: 1px solid #d1fae5;"><span class="mstat-val" style="font-weight: 800; color: #047857; font-size: 14.5px;">₹{{ m.minOrderCost | number:'1.0-0' }}</span><span class="mstat-lbl" style="font-size: 10px; color: #059669;">Min Cost (Price * MOQ)</span></div>
+        <div class="mstat" style="display: flex; flex-direction: column; background: #f8fafc; padding: 6px 10px; border-radius: 6px;"><span class="mstat-val" style="font-weight: 700; color: #334155; font-size: 13.5px;">{{ m.stockQuantity }}</span><span class="mstat-lbl" style="font-size: 10px; color: #94a3b8;">Available Stock</span></div>
+        <div class="mstat" style="display: flex; flex-direction: column; background: #f8fafc; padding: 6px 10px; border-radius: 6px;"><span class="mstat-val" style="font-weight: 700; color: #334155; font-size: 13.5px;">{{ m.leadTime }} days</span><span class="mstat-lbl" style="font-size: 10px; color: #94a3b8;">Lead Time</span></div>
+        <div class="mstat" style="display: flex; flex-direction: column; background: #eff6ff; padding: 6px 10px; border-radius: 6px; grid-column: span 2; border: 1px solid #dbeafe; text-align: center;"><span class="mstat-val" style="font-weight: 700; color: #1e40af; font-size: 13px;">📅 {{ m.availabilityDate | date:'dd MMM yyyy' }}</span><span class="mstat-lbl" style="font-size: 9px; color: #1d4ed8; text-transform: uppercase;">Availability Date</span></div>
       </div>
-      <div class="match-rating">
-        <span class="stars">{{ stars(m.rating) }}</span>
-        <span class="rating-num">{{ m.rating }}/5</span>
+
+      <div class="match-rating" style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px dashed #f0f2f5; margin-bottom: 12px;">
+        <div>
+          <span class="stars" style="color: #f57c00; font-size: 13px;">{{ stars(m.rating) }}</span>
+          <span class="rating-num" style="font-size: 11px; font-weight: 600; color: #64748b; margin-left: 4px;">{{ m.rating }}/5</span>
+        </div>
+        <span style="font-size: 11px; font-weight: 750; color: #2563eb; background: #dbeafe; padding: 3px 8px; border-radius: 12px;">Score: {{ m.recommendationScore }}%</span>
       </div>
-      <button class="btn-primary" style="margin-top:12px">📩 Contact Supplier</button>
+      <button class="btn-primary" style="margin-top:4px; width: 100%;">📩 Contact Supplier</button>
     </div>
   </div>
 </app-layout>

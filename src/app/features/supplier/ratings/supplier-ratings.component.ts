@@ -18,7 +18,7 @@ export class SupplierRatingsComponent implements OnInit {
       error:()=>{ this.loading=false; this.ratings=this.mock(); this.avgRating=4.5; }
     });
   }
-  stars(n:number){ return '★'.repeat(n)+'☆'.repeat(5-n); }
+  stars(n:number){ return '★'.repeat(Math.round(n))+'☆'.repeat(5-Math.round(n)); }
   dist(n:number){ return Math.round(this.ratings.filter(r=>r.rating===n).length/this.ratings.length*100); }
   mock(){return[{id:1,retailerEmail:'shop1@retail.com',rating:5,review:'Excellent quality! Fast delivery.',createdAt:'2025-02-10'},{id:2,retailerEmail:'store2@retail.com',rating:4,review:'Good products, reliable supplier.',createdAt:'2025-02-18'},{id:3,retailerEmail:'mart3@retail.com',rating:5,review:'Best prices in the market!',createdAt:'2025-03-01'}];}
 }

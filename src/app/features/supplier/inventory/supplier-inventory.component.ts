@@ -19,6 +19,18 @@ export class SupplierInventoryComponent implements OnInit {
   constructor(private svc: SupplierService) {}
   ngOnInit() { this.load(); }
 
+  get calculatedAvailabilityPreview(): Date {
+    const d = new Date();
+    d.setDate(d.getDate() + (this.form.leadTime || 1));
+    return d;
+  }
+
+  getAvailabilityDate(leadTime: number): Date {
+    const d = new Date();
+    d.setDate(d.getDate() + (leadTime || 1));
+    return d;
+  }
+
   load() {
     this.svc.getInventory().subscribe({
       next:r=>{ this.loading=false; if(r.success){ this.items=r.data; this.apply(); } else { this.items=[]; this.filtered=[]; } },

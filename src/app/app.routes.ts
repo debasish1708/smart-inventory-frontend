@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard, adminGuard, retailerGuard, supplierGuard, guestGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
+  { path: '', loadComponent: () => import('./features/portal/portal.component').then(m => m.PortalComponent) },
 
   // ── Auth ──
   {
