@@ -8,8 +8,8 @@ export const routes: Routes = [
   {
     path: 'auth', canActivate: [guestGuard],
     children: [
-      { path: 'login',      loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent) },
-      { path: 'register',   loadComponent: () => import('./features/auth/register/register.component').then(m => m.RegisterComponent) },
+      { path: 'login',      redirectTo: '/', pathMatch: 'full' },
+      { path: 'register',   redirectTo: '/', pathMatch: 'full' },
       { path: 'verify-otp', loadComponent: () => import('./features/auth/verify-otp/verify-otp.component').then(m => m.VerifyOtpComponent) },
       { path: '', redirectTo: 'login', pathMatch: 'full' }
     ]

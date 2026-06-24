@@ -52,7 +52,7 @@ export class VerifyOtpComponent implements OnInit, AfterViewInit {
 
   verify(){ this.error=''; const otp=this.getOtp(); if(otp.length<6){ this.error='Please enter all 6 digits.'; return; } this.loading=true;
     this.auth.verifyOtp({email:this.email,otp}).subscribe({
-      next:r=>{ this.loading=false; if(r.success){ this.success='Email verified! Redirecting…'; setTimeout(()=>this.router.navigate(['/auth/login']),1500); } else this.error=r.message; },
+      next:r=>{ this.loading=false; if(r.success){ this.success='Email verified! Redirecting…'; setTimeout(()=>this.router.navigate(['/']),1500); } else this.error=r.message; },
       error:err=>{ this.loading=false; this.error=err.error?.message||'Verification failed.'; }
     }); }
 }

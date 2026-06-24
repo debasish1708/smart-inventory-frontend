@@ -21,6 +21,7 @@ interface StrengthResult {
 export class PortalComponent {
   // Navigation & Modal state
   showAuthModal = false;
+  authMode: 'login' | 'register' = 'login';
 
   // Login attributes
   email = '';
@@ -89,6 +90,7 @@ export class PortalComponent {
 
   openAuth() {
     this.showAuthModal = true;
+    this.authMode = 'login';
     this.resetForms();
   }
 
