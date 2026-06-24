@@ -1,0 +1,24 @@
+.catalog-loading {
+  font-size: 12px;
+  color: #6a1b9a;
+  padding: 8px 0;
+  font-style: italic;
+}
+
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #e0e3ea;
+  border-radius: 8px;
+  font-size: 13.5px;
+  background: #f9fafc;
+  color: #1a1a2e;
+  outline: none;
+  transition: border-color 0.2s;
+  cursor: pointer;
+}
+
+select:focus {
+  border-color: #6a1b9a;
+  background: #fff;
+}

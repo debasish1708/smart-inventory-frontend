@@ -72,3 +72,21 @@ export interface SubscriptionResponse {
   id: number; planName: string; status: string;
   startDateTime?: string; endDateTime?: string;
 }
+
+export interface CatalogCategory {
+  id: number;
+  name: string;
+  description?: string;
+}
+
+export interface CatalogProduct {
+  id: number;
+  name: string;
+  description?: string;
+  sku?: string;
+  brand?: string;
+  unit?: string;
+  categoryId?: number;
+  categoryName?: string;
+}
+

@@ -32,8 +32,28 @@
       <h3>{{ editItem?'Edit Listing':'Add Product Listing' }}</h3>
       <div *ngIf="error" class="alert alert-error">{{ error }}</div>
       <div class="grid-2">
-        <div class="form-group"><label>Product Name *</label><input [(ngModel)]="form.productName"></div>
-        <div class="form-group"><label>Category</label><input [(ngModel)]="form.category"></div>
+        <!-- Category dropdown from API -->
+        <div class="form-group">
+          <label>Category *</label>
+          <select [(ngModel)]="form.category" (change)="onCategoryChange()">
+            <option value="">— Select category —</option>
+            <option *ngFor="let c of categories" [value]="c.name">{{ c.name }}</option>
+          </select>
+        </div>
+
+        <!-- Product Name dropdown filtered by category -->
+        <div class="form-group">
+          <label>Product Name *</label>
+          <div *ngIf="catalogLoading" class="catalog-loading">Loading products…</div>
+          <select *ngIf="!catalogLoading && filteredProducts.length > 0"
+                  [(ngModel)]="form.productName" (change)="onProductChange()">
+            <option value="">— Select product —</option>
+            <option *ngFor="let p of filteredProducts" [value]="p.name">{{ p.name }}</option>
+          </select>
+          <input *ngIf="!catalogLoading && filteredProducts.length === 0"
+                 [(ngModel)]="form.productName" placeholder="Type product name">
+        </div>
+
         <div class="form-group"><label>Price per Unit (₹) *</label><input type="number" [(ngModel)]="form.price"></div>
         <div class="form-group"><label>Minimum Order Qty *</label><input type="number" [(ngModel)]="form.moq"></div>
         <div class="form-group"><label>Stock Quantity *</label><input type="number" [(ngModel)]="form.stockQuantity"></div>
