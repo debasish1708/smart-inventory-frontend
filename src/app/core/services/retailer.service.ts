@@ -28,12 +28,17 @@ export class RetailerService {
     return this.http.get<ApiResponse<Order[]>>(`${this.base}/orders`);
   }
 
+  // Products Autocomplete
+  getProducts(): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${environment.apiUrl}/catalog/products`);
+  }
+
   // Supplier Match
   getAllSupplierMatches(): Observable<ApiResponse<SupplierMatch[]>> {
     return this.http.get<ApiResponse<SupplierMatch[]>>(`${this.base}/supplier-match/all`);
   }
-  getSupplierMatches(product: string): Observable<ApiResponse<SupplierMatch[]>> {
-    return this.http.get<ApiResponse<SupplierMatch[]>>(`${this.base}/supplier-match?product=${encodeURIComponent(product)}`);
+  getSupplierMatches(productId: number): Observable<ApiResponse<SupplierMatch[]>> {
+    return this.http.get<ApiResponse<SupplierMatch[]>>(`${this.base}/supplier-match?productId=${productId}`);
   }
 
   // Ratings

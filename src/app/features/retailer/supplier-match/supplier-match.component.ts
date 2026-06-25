@@ -24,14 +24,62 @@ export class SupplierMatchComponent implements OnInit {
 
   bestMatch: any = null; // Highlighting the top suggested supplier
 
+  // Products Autocomplete State
+  productsList: any[] = [];
+  filteredProducts: any[] = [];
+  selectedProductId: number | null = null;
+  showDropdown = false;
+
   constructor(private svc: RetailerService, private route: ActivatedRoute) {}
 
   ngOnInit() {
+    this.loadProducts();
     this.route.queryParams.subscribe(params => {
-      if (params['search']) {
+      if (params['productId']) {
+        this.selectedProductId = +params['productId'];
+      } else if (params['search']) {
         this.searchProduct = params['search'];
       }
       this.loadAll();
+    });
+  }
+
+  loadProducts() {
+    this.svc.getProducts().subscribe({
+      next: r => {
+        if (r.success) {
+          this.productsList = r.data;
+          this.filteredProducts = [...this.productsList];
+          
+          // If selectedProductId was set from queryParams, resolve its name and search
+          if (this.selectedProductId) {
+            const prod = this.productsList.find(p => p.id === this.selectedProductId);
+            if (prod) {
+              this.searchProduct = prod.name;
+              this.search();
+            }
+          } else if (this.searchProduct) {
+            // Backward compatibility: map search name to ID
+            const prod = this.productsList.find(p => p.name.toLowerCase() === this.searchProduct.toLowerCase());
+            if (prod) {
+              this.selectedProductId = prod.id;
+              this.search();
+            }
+          }
+        }
+      },
+      error: () => {
+        // Use local mock products if API fails
+        this.productsList = this.getMockProducts();
+        this.filteredProducts = [...this.productsList];
+        if (this.selectedProductId) {
+          const prod = this.productsList.find(p => p.id === this.selectedProductId);
+          if (prod) {
+            this.searchProduct = prod.name;
+            this.search();
+          }
+        }
+      }
     });
   }
 
@@ -55,11 +103,28 @@ export class SupplierMatchComponent implements OnInit {
 
   search() {
     if (!this.searchProduct.trim()) {
+      this.selectedProductId = null;
       this.apply();
       return;
     }
+
+    // Fallback: If no selectedProductId, check if the typed text matches a product in our list
+    if (!this.selectedProductId) {
+      const match = this.productsList.find(p => p.name.toLowerCase() === this.searchProduct.trim().toLowerCase());
+      if (match) {
+        this.selectedProductId = match.id;
+      }
+    }
+
+    if (!this.selectedProductId) {
+      // If we still don't have a product ID, we can't query the updated backend by ID, so clear results
+      this.matches = [];
+      this.apply();
+      return;
+    }
+
     this.loading = true;
-    this.svc.getSupplierMatches(this.searchProduct).subscribe({
+    this.svc.getSupplierMatches(this.selectedProductId).subscribe({
       next: r => {
         this.loading = false;
         if (r.success) {
@@ -69,10 +134,52 @@ export class SupplierMatchComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        // Search filter mock data locally
+        // Local filtering from mock/all data as fallback
         this.apply();
       }
     });
+  }
+
+  // Autocomplete UI Helper Methods
+  onSearchInput() {
+    this.selectedProductId = null; // Reset ID if user is editing/typing
+    if (!this.searchProduct.trim()) {
+      this.filteredProducts = [...this.productsList];
+      this.showDropdown = false;
+      return;
+    }
+    this.filteredProducts = this.productsList.filter(p => 
+      p.name.toLowerCase().includes(this.searchProduct.toLowerCase()) ||
+      (p.brand && p.brand.toLowerCase().includes(this.searchProduct.toLowerCase()))
+    );
+    this.showDropdown = true;
+  }
+
+  onSearchFocus() {
+    this.showDropdown = true;
+  }
+
+  onSearchBlur() {
+    // delay to allow click on dropdown items to trigger first
+    setTimeout(() => {
+      this.showDropdown = false;
+    }, 200);
+  }
+
+  selectProduct(product: any) {
+    this.searchProduct = product.name;
+    this.selectedProductId = product.id;
+    this.showDropdown = false;
+    this.search();
+  }
+
+  getMockProducts() {
+    return [
+      { id: 1, name: 'Basmati Rice', brand: 'India Gate', categoryName: 'Grains' },
+      { id: 2, name: 'Wheat Flour', brand: 'Ashirvaad', categoryName: 'Flour' },
+      { id: 3, name: 'Sugar', brand: 'Uttam Sugar', categoryName: 'Sweeteners' },
+      { id: 4, name: 'Refined Oil', brand: 'Fortune', categoryName: 'Oils' }
+    ];
   }
 
   apply() {

@@ -3,9 +3,36 @@
     <div class="section-header">
       <h2>🤝 Find Relevant Suppliers</h2>
     </div>
-    <div class="match-toolbar" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-      <input type="text" [(ngModel)]="searchProduct" placeholder="Search by product (e.g. Rice, Flour…)" (keyup.enter)="search()" style="flex: 1; min-width: 200px;">
+    <div class="match-toolbar" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; position: relative;">
+      <!-- Autocomplete Dropdown Container -->
+      <div class="autocomplete-container" style="position: relative; flex: 1; min-width: 200px;">
+        <input type="text" 
+               [(ngModel)]="searchProduct" 
+               (input)="onSearchInput()"
+               (focus)="onSearchFocus()"
+               (blur)="onSearchBlur()"
+               placeholder="Search by product (e.g. Rice, Flour…)" 
+               (keyup.enter)="search()" 
+               style="width: 100%; box-sizing: border-box; padding: 10px 14px; border: 1.5px solid #d0d5dd; border-radius: 8px; font-size: 14px;">
+        
+        <!-- Autocomplete Dropdown list -->
+        <div class="autocomplete-dropdown" *ngIf="showDropdown && filteredProducts.length > 0" 
+             style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #d0d5dd; border-radius: 8px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); z-index: 1000; max-height: 250px; overflow-y: auto; margin-top: 4px;">
+          <div class="autocomplete-item" 
+               *ngFor="let product of filteredProducts" 
+               (mousedown)="selectProduct(product)"
+               style="padding: 10px 16px; cursor: pointer; border-bottom: 1px solid #f2f4f7; font-size: 13.5px; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s;">
+            <div>
+              <strong style="color: #1e293b; font-weight: 700;">{{ product.name }}</strong>
+              <span *ngIf="product.brand" style="font-size: 11px; color: #64748b; margin-left: 8px; background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">{{ product.brand }}</span>
+            </div>
+            <span style="font-size: 11px; color: #1565c0; background: #eff6ff; padding: 2px 6px; border-radius: 4px; font-weight: 600; text-transform: uppercase;">{{ product.categoryName }}</span>
+          </div>
+        </div>
+      </div>
+
       <button class="btn-primary" style="width:auto;padding:9px 20px" (click)="search()">🔍 Search</button>
+      
       <select [(ngModel)]="sortBy" (change)="apply()" style="padding: 8px 12px; border: 1.5px solid #d0d5dd; border-radius: 8px; font-size: 13px;">
         <option value="smart">Sort: Smart Suggestion</option>
         <option value="price">Sort: Best Price (Per Unit)</option>
