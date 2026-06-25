@@ -29,6 +29,7 @@
       </div>
     </div>
     <div class="hero-visual">
+      <img src="assets/hero_dashboard.png" class="hero-dashboard-img" alt="Smart Inventory Dashboard Mockup">
       <div class="floating-card c1">
         <span class="emoji">📈</span>
         <div>
@@ -115,6 +116,105 @@
         <span class="s-emoji">🛡️</span>
         <h4>Business Verification</h4>
         <p>Ensure reliable B2B networks with our business verification and ratings system for peace of mind.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="how-it-works-section">
+    <div class="section-title">
+      <h2>How It Works</h2>
+      <p>Four simple steps to digitize and automate your B2B supply chain.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-icon-badge">01</div>
+        <h3>Quick Register</h3>
+        <p>Create a dedicated profile as a Retailer or Supplier. Verify your business profile securely with email OTP.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon-badge">02</div>
+        <h3>Stock & Thresholds</h3>
+        <p>Retailers set custom low-stock thresholds. Suppliers list B2B inventory, wholesale pricing, and Minimum Order Quantities (MOQs).</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon-badge">03</div>
+        <h3>AI-Driven Smart Match</h3>
+        <p>When stock runs low, our system instantly recommends local suppliers matching your budget and ratings.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-icon-badge">04</div>
+        <h3>Real-Time Tracking</h3>
+        <p>Order seamlessly and follow the B2B fulfillment lifecycle from supplier acceptance to final delivery.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="about-section">
+    <div class="about-container">
+      <div class="about-info">
+        <div class="badge-new">Our Mission</div>
+        <h2>Empowering Local Commerce Through Technology</h2>
+        <p>Smart Inventory is designed to support local neighborhood retailers, who are the backbone of our communities. By providing enterprise-grade supply chain intelligence, we help small businesses compete on a level playing field with global e-commerce giants.</p>
+        <p>Our platform automates tedious stock tracking, simplifies supplier discovery, and secures reliable B2B networks, saving hours of manual labor every single week.</p>
+        
+        <!-- Interactive About Button -->
+        <button class="btn-about-interactive" (click)="toggleAboutDetails()">
+          {{ showAboutDetails ? 'Show Less Details' : 'Explore Our Core Values →' }}
+        </button>
+      </div>
+      
+      <div class="about-interactive-card">
+        <div class="card-glass-panel">
+          <div class="card-header">
+            <span class="pulse-dot"></span>
+            <h4>Why Smart Inventory?</h4>
+          </div>
+          
+          <!-- Default state before click -->
+          <div class="card-content-default" *ngIf="!showAboutDetails">
+            <div class="interactive-prompt">
+              <span class="sparkle-emoji">✨</span>
+              <p>Click the <strong>Explore Our Core Values</strong> button on the left to unlock our operational pillars and platform technology stack.</p>
+            </div>
+            <div class="stats-preview">
+              <div class="stat-mini">
+                <strong>98%</strong>
+                <span>Uptime</span>
+              </div>
+              <div class="stat-mini">
+                <strong>3x</strong>
+                <span>Restock Speed</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Expanded state after click -->
+          <div class="card-content-expanded" *ngIf="showAboutDetails">
+            <div class="value-item">
+              <span class="value-icon">🤖</span>
+              <div>
+                <h5>Intelligent Automation</h5>
+                <p>Advanced matching algorithms calculate the absolute best price-to-MOQ ratios in milliseconds.</p>
+              </div>
+            </div>
+            <div class="value-item">
+              <span class="value-icon">🤝</span>
+              <div>
+                <h5>Community First</h5>
+                <p>We foster direct, trusted connections between local shopkeepers and regional suppliers.</p>
+              </div>
+            </div>
+            <div class="value-item">
+              <span class="value-icon">🔒</span>
+              <div>
+                <h5>Total Transparency</h5>
+                <p>Verified ratings, visible lead times, and tracked order lifecycles guarantee trust at every step.</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>

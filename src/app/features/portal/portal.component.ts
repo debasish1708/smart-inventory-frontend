@@ -22,6 +22,11 @@ export class PortalComponent {
   // Navigation & Modal state
   showAuthModal = false;
   authMode: 'login' | 'register' = 'login';
+  showAboutDetails = false;
+
+  toggleAboutDetails() {
+    this.showAboutDetails = !this.showAboutDetails;
+  }
 
   // Login attributes
   email = '';
