@@ -3,12 +3,18 @@
 
   <div class="user-area">
     <!-- Clickable avatar only — dropdown shows details -->
-    <div class="avatar" (click)="toggleDropdown()" title="Profile">{{ initials }}</div>
+    <div class="avatar" (click)="toggleDropdown()" title="Profile" style="position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; box-shadow: 0 1px 3px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.2);">
+      <img *ngIf="profile?.profileImageUrl" [src]="getImgUrl(profile.profileImageUrl)" style="width:100%; height:100%; object-fit:cover;" />
+      <span *ngIf="!profile?.profileImageUrl">{{ initials }}</span>
+    </div>
 
     <!-- Profile dropdown -->
     <div class="profile-dropdown" *ngIf="dropdownOpen">
       <div class="dropdown-header">
-        <div class="dropdown-avatar">{{ initials }}</div>
+        <div class="dropdown-avatar" style="position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
+          <img *ngIf="profile?.profileImageUrl" [src]="getImgUrl(profile.profileImageUrl)" style="width:100%; height:100%; object-fit:cover;" />
+          <span *ngIf="!profile?.profileImageUrl">{{ initials }}</span>
+        </div>
         <div class="dropdown-meta">
           <span class="dropdown-email">{{ email }}</span>
           <span class="role-chip" [class]="'role-' + role.toLowerCase()">{{ role }}</span>
