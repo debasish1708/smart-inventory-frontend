@@ -7,7 +7,6 @@ export const RETAILER_NAV: NavItem[] = [
   { label: 'Order Details',   icon: '🛒', route: '/retailer/orders'    },
   { label: 'Sales Portal',    icon: '💰', route: '/retailer/sales'     },
   { label: 'Supplier Match',  icon: '🤝', route: '/retailer/supplier-match' },
-  { label: 'My Ratings',      icon: '⭐', route: '/retailer/ratings'   },
   { label: 'Analytics',       icon: '📊', route: '/retailer/analytics' },
   { label: 'Subscription',    icon: '💳', route: '/retailer/subscription' },
 ];
