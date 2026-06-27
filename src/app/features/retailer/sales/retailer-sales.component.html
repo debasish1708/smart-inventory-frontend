@@ -1,6 +1,25 @@
 <app-layout pageTitle="Sales Portal / POS" [navItems]="nav" roleLabel="Retailer Portal">
 
-  <div class="pos-container">
+  <!-- Tabs Navigation Bar -->
+  <div class="sales-tabs-nav">
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'pos'" 
+      (click)="switchTab('pos')"
+    >
+      🛍️ New Sale (POS)
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="activeTab === 'history'" 
+      (click)="switchTab('history')"
+    >
+      📋 Sales History Log
+    </button>
+  </div>
+
+  <!-- Tab 1: New Sale POS -->
+  <div class="pos-container" *ngIf="activeTab === 'pos'">
     
     <!-- Left Column: Catalog -->
     <div class="catalog-panel">
@@ -39,7 +58,7 @@
 
           <div>
             <div class="product-details">
-              <span class="product-price">${{ item.price | number:'1.2-2' }}</span>
+              <span class="product-price">₹{{ item.price | number:'1.2-2' }}</span>
               <span 
                 class="product-stock"
                 [class.low]="item.quantity > 0 && item.quantity <= (item.thresholdValue || 10)"
@@ -77,7 +96,7 @@
         <div *ngFor="let item of cart" class="cart-item">
           <div class="item-info">
             <span class="item-title">{{ item.productName }}</span>
-            <span class="item-meta">${{ item.price | number:'1.2-2' }} / {{ item.unit || 'unit' }}</span>
+            <span class="item-meta">₹{{ item.price | number:'1.2-2' }} / {{ item.unit || 'unit' }}</span>
           </div>
 
           <div class="item-actions">
@@ -87,7 +106,7 @@
               <button class="qty-btn" (click)="increaseQty(item)">+</button>
             </div>
 
-            <span class="item-subtotal">${{ (item.price * item.qty) | number:'1.2-2' }}</span>
+            <span class="item-subtotal">₹{{ (item.price * item.qty) | number:'1.2-2' }}</span>
 
             <button class="remove-btn" (click)="removeFromCart(item)">🗑️</button>
           </div>
@@ -98,15 +117,15 @@
       <div class="checkout-summary" *ngIf="cart.length > 0">
         <div class="summary-row">
           <span>Subtotal</span>
-          <span>${{ getCartTotal() | number:'1.2-2' }}</span>
+          <span>₹{{ getCartTotal() | number:'1.2-2' }}</span>
         </div>
         <div class="summary-row">
           <span>GST / Taxes (0%)</span>
-          <span>$0.00</span>
+          <span>₹0.00</span>
         </div>
         <div class="summary-row total">
           <span>Grand Total</span>
-          <span class="val">${{ getCartTotal() | number:'1.2-2' }}</span>
+          <span class="val">₹{{ getCartTotal() | number:'1.2-2' }}</span>
         </div>
 
         <div style="margin-top: 16px;">
@@ -144,8 +163,102 @@
           (click)="checkout()"
           [disabled]="checkoutLoading"
         >
-          {{ checkoutLoading ? '⚡ Processing Transaction...' : ('💳 Confirm Checkout - $' + (getCartTotal() | number:'1.2-2')) }}
+          {{ checkoutLoading ? '⚡ Processing Transaction...' : ('💳 Confirm Checkout - ₹' + (getCartTotal() | number:'1.2-2')) }}
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 2: Sales History Log -->
+  <div class="history-container" *ngIf="activeTab === 'history'">
+    
+    <!-- Today's Stats Cards -->
+    <div class="stats-grid" *ngIf="todaySummary">
+      <div class="stat-card revenue">
+        <div class="stat-icon-wrapper">💰</div>
+        <div class="stat-details">
+          <span class="stat-label">Today's Revenue</span>
+          <h3 class="stat-value">₹{{ (todaySummary.totalAmount || 0) | number:'1.2-2' }}</h3>
+        </div>
+      </div>
+      <div class="stat-card count">
+        <div class="stat-icon-wrapper">📦</div>
+        <div class="stat-details">
+          <span class="stat-label">Today's Sales Count</span>
+          <h3 class="stat-value">{{ todaySummary.totalCount || 0 }} Transactions</h3>
+        </div>
+      </div>
+      <div class="stat-card average">
+        <div class="stat-icon-wrapper">📈</div>
+        <div class="stat-details">
+          <span class="stat-label">Average Basket Value</span>
+          <h3 class="stat-value">
+            ₹{{ (todaySummary.totalCount > 0 ? (todaySummary.totalAmount / todaySummary.totalCount) : 0) | number:'1.2-2' }}
+          </h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- History Data Table Card -->
+    <div class="history-panel">
+      <div class="panel-header">
+        <h2>📋 Sales History Log</h2>
+        <button class="refresh-btn" (click)="refreshHistory()">🔄 Refresh List</button>
+      </div>
+
+      <!-- Ajax Loading Skeletons for Smooth Transitions -->
+      <div class="skeleton-wrapper" *ngIf="historyLoading && salesHistory.length === 0">
+        <div class="skeleton-row" *ngFor="let item of [1, 2, 3, 4]">
+          <div class="skeleton-cell medium"></div>
+          <div class="skeleton-cell long"></div>
+          <div class="skeleton-cell short"></div>
+          <div class="skeleton-cell medium"></div>
+          <div class="skeleton-cell action"></div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!historyLoading && salesHistory.length === 0">
+        <span class="empty-icon">📭</span>
+        <p>No sales transactions recorded today. Start selling items in the counter!</p>
+      </div>
+
+      <!-- Data Table -->
+      <div class="table-wrap fade-in" *ngIf="salesHistory.length > 0">
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Transaction ID</th>
+              <th>Date & Time</th>
+              <th>Items Sold</th>
+              <th>Grand Total</th>
+              <th style="text-align: right;">Invoice Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let sale of salesHistory" class="history-row">
+              <td class="tx-id">#TXN-{{ sale.id }}</td>
+              <td class="tx-date">{{ sale.saleDate | date:'medium' }}</td>
+              <td class="tx-items">
+                <span class="items-badge">{{ sale.items?.length || 0 }} items</span>
+              </td>
+              <td class="tx-amount">₹{{ sale.totalAmount | number:'1.2-2' }}</td>
+              <td style="text-align: right;">
+                <button class="btn-invoice-view" (click)="viewReceiptFromHistory(sale)">
+                  📄 View Receipt
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Pagination/Load More Wrapper -->
+        <div class="load-more-wrapper" *ngIf="!historyLast">
+          <button class="load-more-btn" (click)="loadNextHistoryPage()" [disabled]="loadingMore">
+            <span *ngIf="!loadingMore">📥 Load More Transactions</span>
+            <span *ngIf="loadingMore">⏳ Loading Next Page...</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -179,18 +292,18 @@
           
           <div *ngFor="let item of receipt.items" class="receipt-item-row">
             <span>{{ item.productName }}</span>
-            <span class="qty-price">{{ item.quantity }} x ${{ item.price | number:'1.2-2' }}</span>
-            <span class="tot">${{ (item.quantity * item.price) | number:'1.2-2' }}</span>
+            <span class="qty-price">{{ item.quantity }} x ₹{{ item.price | number:'1.2-2' }}</span>
+            <span class="tot">₹{{ (item.quantity * item.price) | number:'1.2-2' }}</span>
           </div>
         </div>
 
         <div class="receipt-row bold">
           <span>SUBTOTAL</span>
-          <span>${{ receipt.totalAmount | number:'1.2-2' }}</span>
+          <span>₹{{ receipt.totalAmount | number:'1.2-2' }}</span>
         </div>
         <div class="receipt-row bold" style="font-size: 15px; margin-top: 6px;">
           <span>GRAND TOTAL</span>
-          <span>${{ receipt.totalAmount | number:'1.2-2' }}</span>
+          <span>₹{{ receipt.totalAmount | number:'1.2-2' }}</span>
         </div>
 
         <div class="receipt-footer">

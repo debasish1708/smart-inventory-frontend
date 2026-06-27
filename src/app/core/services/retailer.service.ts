@@ -65,7 +65,10 @@ export class RetailerService {
   submitSale(data: any): Observable<ApiResponse<any>> {
     return this.http.post<ApiResponse<any>>(`${this.base}/sales`, data);
   }
-  getSales(): Observable<ApiResponse<any[]>> {
-    return this.http.get<ApiResponse<any[]>>(`${this.base}/sales`);
+  getSales(page: number = 0, size: number = 10): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.base}/sales?page=${page}&size=${size}`);
+  }
+  getTodaySalesSummary(): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.base}/sales/today-summary`);
   }
 }

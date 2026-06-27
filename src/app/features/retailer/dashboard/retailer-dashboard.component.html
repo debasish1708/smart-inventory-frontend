@@ -118,7 +118,7 @@
             </div>
             <div *ngFor="let rec of n.recommendations" style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 6px 0; border-bottom: 1px dashed #e2e8f0;">
               <span style="color: #334155; font-weight: 600;">Rank #{{ rec.rank }} - {{ rec.supplier?.email }}</span>
-              <span style="color: #2563eb; font-weight: 700;">${{ rec.price | number:'1.2-2' }}</span>
+              <span style="color: #2563eb; font-weight: 700;">₹{{ rec.price | number:'1.2-2' }}</span>
             </div>
             <div style="margin-top: 8px; text-align: right;">
               <a [routerLink]="['/retailer/supplier-match']" [queryParams]="{ productId: n.product?.id }" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: none; display: inline-block;">
