@@ -15,6 +15,8 @@ export class SupplierDashboardComponent implements OnInit {
   stats = { inventory:0, orders:0, pendingOrders:0, avgRating:0 };
   recentOrders: any[] = [];
   loading = true;
+  subscription: any = null;
+  hasActiveSubscription = false;
 
   constructor(private svc: SupplierService, private auth: AuthService) {}
   get userName()         { return this.auth.getCurrentUser()?.email?.split('@')[0]??'Supplier'; }
@@ -22,6 +24,35 @@ export class SupplierDashboardComponent implements OnInit {
   get profileCompleted() { return this.auth.getCurrentUser()?.profileCompleted??false; }
 
   ngOnInit() {
+    this.checkSubscription();
+  }
+
+  checkSubscription() {
+    this.loading = true;
+    this.svc.getSubscription().subscribe({
+      next: r => {
+        if (r.success && r.data) {
+          this.subscription = r.data;
+          this.hasActiveSubscription = !!(r.data.status === 'ACTIVE' && r.data.endDateTime && new Date(r.data.endDateTime).getTime() > new Date().getTime());
+        } else {
+          this.subscription = null;
+          this.hasActiveSubscription = false;
+        }
+        if (this.hasActiveSubscription) {
+          this.loadDashboard();
+        } else {
+          this.loading = false;
+        }
+      },
+      error: () => {
+        this.subscription = null;
+        this.hasActiveSubscription = false;
+        this.loading = false;
+      }
+    });
+  }
+
+  loadDashboard() {
     this.svc.getInventory().subscribe({ next:r=>{ this.loading=false; if(r.success) this.stats.inventory=r.data.length; }, error:()=>this.loading=false });
     this.svc.getOrders().subscribe({ next:r=>{ if(r.success){ this.recentOrders=r.data.slice(0,5); this.stats.orders=r.data.length; this.stats.pendingOrders=r.data.filter((o:any)=>o.status==='PENDING').length; }}});
     this.svc.getRatings().subscribe({ next:r=>{ if(r.success&&r.data.length) this.stats.avgRating=+(r.data.reduce((s:number,x:any)=>s+x.rating,0)/r.data.length).toFixed(1); }});

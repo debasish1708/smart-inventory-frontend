@@ -1,33 +1,181 @@
 <app-layout pageTitle="Subscription" [navItems]="nav" roleLabel="Retailer Portal">
-  <div *ngIf="upgradeSuccess" class="alert alert-success" style="margin-bottom: 20px; padding: 12px; border-radius: 8px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46;">
-    🎉 Subscription upgraded to <strong>{{ selectedPlanName }}</strong> successfully!
+  <!-- Alerts -->
+  <div *ngIf="upgradeSuccess" class="alert alert-success" style="margin-bottom: 24px; padding: 16px; border-radius: 12px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; display: flex; align-items: center; gap: 8px; font-weight: 500; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+    <span>🎉</span> Subscription upgraded to <strong>{{ selectedPlanName }}</strong> successfully!
   </div>
 
-  <div class="card" *ngIf="current">
-    <div class="card-title">💳 Current Plan</div>
-    <div class="current-plan">
-      <span class="plan-badge">{{ current.planName }}</span>
-      <span class="plan-status">{{ current.status }}</span>
-      <span *ngIf="current.endDateTime" style="font-size:13px;color:#888">Valid till: {{ current.endDateTime | date:'dd MMM yyyy' }}</span>
+  <!-- Current Plan Card -->
+  <div class="card" *ngIf="current" style="margin-bottom: 32px; padding: 28px; border-radius: 16px; background: linear-gradient(135deg, #ffffff, #f8fafc); border: 1px solid #e2e8f0; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);">
+    <div class="card-title" style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; border-bottom: none; padding-bottom: 0;">
+      <span style="font-size: 20px;">💳</span> Current Subscription Details
+    </div>
+    
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div [style.background]="getPlanColor(current.planName)" style="color: white; padding: 12px 24px; border-radius: 12px; font-size: 16px; font-weight: 800; letter-spacing: 0.5px; box-shadow: 0 4px 12px -2px rgba(0,0,0,0.15);">
+          {{ current.planName }}
+        </div>
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span [class]="current.status === 'ACTIVE' ? 'status-active' : 'status-expired'" style="font-size: 12px; font-weight: 750; padding: 4px 12px; border-radius: 9999px; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px;">
+              <span [style.background]="current.status === 'ACTIVE' ? '#22c55e' : '#ef4444'" style="width: 8px; height: 8px; border-radius: 50%; display: inline-block;"></span>
+              {{ current.status }}
+            </span>
+          </div>
+          <p style="margin: 6px 0 0 0; font-size: 12px; color: #64748b; font-weight: 600;">
+            Activated: {{ current.startDateTime | date:'dd MMM yyyy, hh:mm a' }}
+          </p>
+        </div>
+      </div>
+      
+      <div *ngIf="current.endDateTime" style="text-align: right;">
+        <div style="font-size: 11px; color: #64748b; font-weight: 750; text-transform: uppercase; letter-spacing: 0.75px;">Last Date of Expiration</div>
+        <div style="font-size: 20px; font-weight: 850; color: #0f172a; margin-top: 6px; display: flex; align-items: center; gap: 6px; justify-content: flex-end;">
+          <span>📅</span> {{ current.endDateTime | date:'dd MMM yyyy' }}
+        </div>
+        <div [style.color]="isExpiringSoon(current.endDateTime) ? '#eab308' : '#10b981'" style="font-size: 12px; font-weight: 700; margin-top: 4px;">
+          {{ getDaysRemainingText(current.endDateTime) }}
+        </div>
+      </div>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">📦 Available Plans</div>
+  <!-- Available Plans Section -->
+  <div class="card" style="padding: 32px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05);">
+    <div class="card-title" style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 28px; display: flex; align-items: center; gap: 8px; border-bottom: none; padding-bottom: 0;">
+      <span style="font-size: 20px;">📦</span> Choose Your Subscription Plan
+    </div>
+    
     <div class="plans-grid">
-      <div class="plan-card" *ngFor="let p of plans" [class.active]="isActive(p.name)">
-        <div class="plan-badge-top" *ngIf="isActive(p.name)">✓ Current Plan</div>
-        <div class="plan-name" [style.color]="p.color">{{ p.name }}</div>
-        <div class="plan-price">
-          <span *ngIf="p.price === 0">Free</span>
-          <span *ngIf="p.price > 0">₹{{ p.price }}<small>/month</small></span>
+      <div class="plan-card" *ngFor="let p of plans" [class.active]="isActive(p.name)" [style.border-color]="isActive(p.name) ? p.color : '#e2e8f0'">
+        <div class="plan-badge-top" *ngIf="isActive(p.name)" [style.background]="p.color">
+          ✓ Active Plan
         </div>
-        <ul class="plan-features">
-          <li *ngFor="let f of p.features">{{ f }}</li>
-        </ul>
-        <button class="btn-primary" [disabled]="isActive(p.name) || (upgradeLoading && selectedPlanName === p.name)" [style.background]="p.color" (click)="upgrade(p.name)">
-          <span *ngIf="upgradeLoading && selectedPlanName === p.name">Upgrading...</span>
-          <span *ngIf="!(upgradeLoading && selectedPlanName === p.name)">{{ isActive(p.name) ? 'Active' : 'Upgrade' }}</span>
+        
+        <div>
+          <div class="plan-name" [style.color]="p.color">{{ p.name }}</div>
+          <div class="plan-price">
+            <span *ngIf="p.price === 0">Free</span>
+            <span *ngIf="p.price > 0">₹{{ p.price }}<small>/month</small></span>
+          </div>
+          
+          <ul class="plan-features">
+            <li *ngFor="let f of p.features">
+              <span class="checkmark" [style.color]="p.color">✓</span>
+              <span>{{ f }}</span>
+            </li>
+          </ul>
+        </div>
+        
+        <button class="upgrade-btn" 
+                [disabled]="isActive(p.name)" 
+                [style.background]="isActive(p.name) ? '#f1f5f9' : p.color"
+                [style.color]="isActive(p.name) ? '#94a3b8' : '#ffffff'"
+                (click)="upgrade(p.name)">
+          <span>{{ isActive(p.name) ? 'Current Plan' : (isUnexpired(p.name) ? 'Reactivate Plan' : 'Activate Plan') }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Simulation Modal -->
+  <div class="modal-overlay" *ngIf="showPaymentModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>💳 Simulated Gateway Payment</h3>
+        <button class="modal-close-x" (click)="closePayment()">×</button>
+      </div>
+
+      <div class="plan-summary">
+        <div>Plan: <strong style="text-transform: uppercase;">{{ selectedPlanName }}</strong></div>
+        <div>Amount Due: <strong style="color: #0f172a; font-size: 18px;">₹{{ getSelectedPlanPrice() }}</strong></div>
+      </div>
+
+      <div class="payment-tabs">
+        <button class="tab-btn" [class.active]="paymentMethod === 'card'" (click)="paymentMethod = 'card'">
+          💳 Pay by Card
+        </button>
+        <button class="tab-btn" [class.active]="paymentMethod === 'upi'" (click)="paymentMethod = 'upi'">
+          📱 Pay by UPI / Scan
+        </button>
+      </div>
+
+      <div *ngIf="paymentError" class="payment-error-alert">
+        ⚠️ {{ paymentError }}
+      </div>
+
+      <!-- CARD FORM -->
+      <div *ngIf="paymentMethod === 'card'" class="payment-form">
+        <div class="form-group">
+          <label>Cardholder Name</label>
+          <input type="text" placeholder="John Doe" [(ngModel)]="cardForm.name" name="cardName" />
+        </div>
+        <div class="form-group">
+          <label>Card Number</label>
+          <input type="text" placeholder="4111 2222 3333 4444" maxlength="19" (input)="onCardNumberInput($event)" [(ngModel)]="cardForm.number" name="cardNumber" />
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label>Expiry Date</label>
+            <input type="text" placeholder="MM/YY" maxlength="5" (input)="onCardExpiryInput($event)" [(ngModel)]="cardForm.expiry" name="cardExpiry" />
+          </div>
+          <div class="form-group">
+            <label>CVV</label>
+            <input type="password" placeholder="123" maxlength="3" [(ngModel)]="cardForm.cvv" name="cardCvv" />
+          </div>
+        </div>
+      </div>
+
+      <!-- UPI QR CODE SCANNER -->
+      <div *ngIf="paymentMethod === 'upi'" class="payment-form text-center">
+        <p style="font-size:12.5px; color:#64748b; margin-bottom:16px;">
+          Scan the QR code below using GPay, PhonePe, Paytm, or any BHIM UPI app.
+        </p>
+
+        <div class="upi-qr-scanner">
+          <svg width="140" height="140" viewBox="0 0 100 100" style="display:block; margin:0 auto;">
+            <!-- Corner brackets -->
+            <path d="M 10,20 L 10,10 L 20,10" fill="none" stroke="#7c3aed" stroke-width="2.5" />
+            <path d="M 80,10 L 90,10 L 90,20" fill="none" stroke="#7c3aed" stroke-width="2.5" />
+            <path d="M 90,80 L 90,90 L 80,90" fill="none" stroke="#7c3aed" stroke-width="2.5" />
+            <path d="M 20,90 L 10,90 L 10,80" fill="none" stroke="#7c3aed" stroke-width="2.5" />
+            
+            <!-- QR elements -->
+            <rect x="22" y="22" width="16" height="16" fill="#0f172a" />
+            <rect x="25" y="25" width="10" height="10" fill="#ffffff" />
+            <rect x="28" y="28" width="4" height="4" fill="#0f172a" />
+            
+            <rect x="62" y="22" width="16" height="16" fill="#0f172a" />
+            <rect x="65" y="25" width="10" height="10" fill="#ffffff" />
+            <rect x="68" y="28" width="4" height="4" fill="#0f172a" />
+            
+            <rect x="22" y="62" width="16" height="16" fill="#0f172a" />
+            <rect x="25" y="65" width="10" height="10" fill="#ffffff" />
+            <rect x="28" y="68" width="4" height="4" fill="#0f172a" />
+            
+            <!-- Random mock block graphics -->
+            <rect x="44" y="22" width="12" height="6" fill="#0f172a" />
+            <rect x="44" y="34" width="6" height="12" fill="#0f172a" />
+            <rect x="54" y="44" width="12" height="6" fill="#0f172a" />
+            <rect x="62" y="52" width="6" height="6" fill="#0f172a" />
+            <rect x="44" y="62" width="6" height="16" fill="#0f172a" />
+            <rect x="54" y="72" width="12" height="6" fill="#0f172a" />
+            <rect x="72" y="62" width="6" height="12" fill="#0f172a" />
+          </svg>
+          <div class="scan-line"></div>
+        </div>
+
+        <div class="form-group" style="margin-top:20px;">
+          <label>Or Pay via UPI ID</label>
+          <input type="text" placeholder="username@upi" [(ngModel)]="upiId" name="upiId" style="text-align:center;" />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closePayment()">Cancel</button>
+        <button class="btn-pay" [disabled]="submittingPayment" (click)="submitPayment()">
+          <span *ngIf="submittingPayment">Processing...</span>
+          <span *ngIf="!submittingPayment">Simulate Payment (₹{{ getSelectedPlanPrice() }})</span>
         </button>
       </div>
     </div>

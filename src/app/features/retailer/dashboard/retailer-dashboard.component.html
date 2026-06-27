@@ -18,10 +18,34 @@
   </div>
 
   <ng-container *ngIf="profileCompleted && userStatus === 'ACTIVE'">
-    <div class="welcome-msg">
-      <h2>Welcome back, {{ userName }}! 👋</h2>
-      <p>Here's your inventory & order summary for today.</p>
+    <!-- Subscription Inactive / Expired Banner -->
+    <div *ngIf="!hasActiveSubscription" class="pending-banner" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-color: #f59e0b; color: #78350f;">
+      <div class="icon">💳</div>
+      <h3 style="color: #92400e;">Subscription Required</h3>
+      <p style="color: #b45309;">Please select and pay for a subscription plan to unlock full inventory management, supplier matching, sales portal, and analytics.</p>
+      <a routerLink="/retailer/subscription" class="btn-primary" style="display:inline-block; width:auto; padding:10px 28px; margin-top:14px; text-decoration:none; background: #d97706; border: none; color: #fff;">
+        Select Plan & Activate →
+      </a>
     </div>
+
+    <!-- Active Subscription Banner -->
+    <div *ngIf="hasActiveSubscription" style="margin-bottom: 20px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 18px;">✅</span>
+        <span style="font-size: 13.5px; font-weight: 700; color: #166534;">
+          Your subscription is ACTIVE under the <strong style="text-transform: uppercase;">{{ subscription?.planName }}</strong> plan.
+        </span>
+      </div>
+      <span style="font-size: 12.5px; font-weight: 750; color: #15803d; background: #dcfce7; padding: 4px 12px; border-radius: 20px;">
+        Expires: {{ subscription?.endDateTime | date:'dd MMM yyyy' }}
+      </span>
+    </div>
+
+    <ng-container *ngIf="hasActiveSubscription">
+      <div class="welcome-msg">
+        <h2>Welcome back, {{ userName }}! 👋</h2>
+        <p>Here's your inventory & order summary for today.</p>
+      </div>
 
     <!-- Stats -->
     <div class="stats-grid">
@@ -140,6 +164,7 @@
         <a routerLink="/retailer/analytics"      class="quick-btn">📊 Analytics</a>
       </div>
     </div>
+    </ng-container>
   </ng-container>
 
 </app-layout>

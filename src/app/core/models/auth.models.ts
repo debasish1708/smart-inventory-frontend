@@ -71,6 +71,7 @@ export interface AnalyticsResponse {
 export interface SubscriptionResponse {
   id: number; planName: string; status: string;
   startDateTime?: string; endDateTime?: string;
+  unexpiredPlans?: string[];
 }
 
 export interface CatalogCategory {

@@ -20,6 +20,8 @@ export class RetailerDashboardComponent implements OnInit {
   notifications: any[] = [];
   lowStockItems: any[] = [];
   loading = true;
+  subscription: any = null;
+  hasActiveSubscription = false;
 
   constructor(private retailerSvc: RetailerService, private auth: AuthService) {}
 
@@ -32,7 +34,32 @@ export class RetailerDashboardComponent implements OnInit {
   get profileCompleted() { return this.auth.getCurrentUser()?.profileCompleted ?? false; }
 
   ngOnInit() {
-    this.loadDashboard();
+    this.checkSubscription();
+  }
+
+  checkSubscription() {
+    this.loading = true;
+    this.retailerSvc.getSubscription().subscribe({
+      next: r => {
+        if (r.success && r.data) {
+          this.subscription = r.data;
+          this.hasActiveSubscription = !!(r.data.status === 'ACTIVE' && r.data.endDateTime && new Date(r.data.endDateTime).getTime() > new Date().getTime());
+        } else {
+          this.subscription = null;
+          this.hasActiveSubscription = false;
+        }
+        if (this.hasActiveSubscription) {
+          this.loadDashboard();
+        } else {
+          this.loading = false;
+        }
+      },
+      error: () => {
+        this.subscription = null;
+        this.hasActiveSubscription = false;
+        this.loading = false;
+      }
+    });
   }
 
   loadDashboard() {
