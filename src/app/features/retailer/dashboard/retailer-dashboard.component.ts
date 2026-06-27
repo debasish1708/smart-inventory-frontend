@@ -87,4 +87,28 @@ export class RetailerDashboardComponent implements OnInit {
       next: r => { if (r.success) this.notifications = r.data.slice(0, 4); }
     });
   }
+
+  getPlanColor(name: string): string {
+    if (name === 'FREE') return '#64748b';
+    if (name === 'BASIC') return '#2563eb';
+    if (name === 'PREMIUM') return '#7c3aed';
+    return '#64748b';
+  }
+
+  isExpiringSoon(dateStr: string): boolean {
+    if (!dateStr) return false;
+    const diff = new Date(dateStr).getTime() - new Date().getTime();
+    const days = diff / (1000 * 60 * 60 * 24);
+    return days > 0 && days <= 7;
+  }
+
+  getDaysRemainingText(dateStr: string): string {
+    if (!dateStr) return '';
+    const diff = new Date(dateStr).getTime() - new Date().getTime();
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    if (days < 0) return 'Expired';
+    if (days === 0) return 'Expires today';
+    if (days === 1) return 'Expires tomorrow';
+    return `${days} days remaining`;
+  }
 }

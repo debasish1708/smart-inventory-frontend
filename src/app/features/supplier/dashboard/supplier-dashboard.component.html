@@ -25,16 +25,28 @@
     </div>
 
     <!-- Active Subscription Banner -->
-    <div *ngIf="hasActiveSubscription" style="margin-bottom: 20px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span style="font-size: 18px;">✅</span>
-        <span style="font-size: 13.5px; font-weight: 700; color: #166534;">
-          Your subscription is ACTIVE under the <strong style="text-transform: uppercase;">{{ subscription?.planName }}</strong> plan.
-        </span>
+    <div *ngIf="hasActiveSubscription" style="margin-bottom: 24px; padding: 20px; border-radius: 16px; background: linear-gradient(135deg, #ffffff, #f8fafc); border: 1px solid #e2e8f0; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div [style.background]="getPlanColor(subscription?.planName)" style="color: white; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+          {{ subscription?.planName }}
+        </div>
+        <div>
+          <div style="font-size: 14.5px; font-weight: 800; color: #0f172a;">Active Subscription</div>
+          <p style="margin: 4px 0 0 0; font-size: 11.5px; color: #64748b; font-weight: 600;">
+            Activated: {{ subscription?.startDateTime | date:'dd MMM yyyy, hh:mm a' }}
+          </p>
+        </div>
       </div>
-      <span style="font-size: 12.5px; font-weight: 750; color: #15803d; background: #dcfce7; padding: 4px 12px; border-radius: 20px;">
-        Expires: {{ subscription?.endDateTime | date:'dd MMM yyyy' }}
-      </span>
+      
+      <div style="text-align: right;">
+        <div style="font-size: 10px; color: #64748b; font-weight: 750; text-transform: uppercase; letter-spacing: 0.75px;">Last Date of Expiration</div>
+        <div style="font-size: 16px; font-weight: 850; color: #0f172a; margin-top: 4px; display: flex; align-items: center; gap: 6px; justify-content: flex-end;">
+          <span>📅</span> {{ subscription?.endDateTime | date:'dd MMM yyyy' }}
+        </div>
+        <div [style.color]="isExpiringSoon(subscription?.endDateTime) ? '#eab308' : '#10b981'" style="font-size: 12px; font-weight: 700; margin-top: 4px;">
+          {{ getDaysRemainingText(subscription?.endDateTime) }}
+        </div>
+      </div>
     </div>
 
     <ng-container *ngIf="hasActiveSubscription">
@@ -54,11 +66,37 @@
       <div class="card-title">📋 Recent Orders</div>
       <div *ngIf="recentOrders.length===0" class="empty-state"><div class="empty-icon">📭</div><p>No orders yet</p></div>
       <table *ngIf="recentOrders.length>0">
-        <thead><tr><th>Order ID</th><th>Retailer</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Retailer</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Booking Amount</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
         <tbody>
           <tr *ngFor="let o of recentOrders">
             <td>#{{ o.id }}</td>
             <td>{{ o.retailerEmail||'—' }}</td>
+            <td>
+              <div *ngFor="let item of o.items" style="font-weight: 500;">
+                {{ item.productName }}
+              </div>
+            </td>
+            <td>
+              <div *ngFor="let item of o.items" style="color: #64748b;">
+                {{ item.quantity }} {{ item.unit || '' }}
+              </div>
+            </td>
+            <td>
+              <div style="font-weight: 700; color: #0f172a;">
+                ₹{{ o.totalAmount | number:'1.2-2' }}
+              </div>
+            </td>
             <td><span class="badge" [class]="'badge-'+o.status.toLowerCase()">{{ o.status }}</span></td>
             <td>{{ o.orderDate | date:'dd MMM' }}</td>
             <td><a routerLink="/supplier/orders" class="btn-sm btn-info">Manage</a></td>
