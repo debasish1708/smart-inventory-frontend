@@ -105,9 +105,27 @@
           <div class="empty-icon">✅</div>
           <p>No alerts</p>
         </div>
-        <div *ngFor="let n of notifications" class="notif-item">
-          <span class="notif-icon">⚠️</span>
-          <span class="notif-msg">{{ n.message }}</span>
+        <div *ngFor="let n of notifications" class="notif-item" style="flex-direction: column; align-items: flex-start; gap: 8px; border-bottom: 1px solid #f1f5f9; padding: 12px 0;">
+          <div style="display: flex; gap: 8px; align-items: center; width: 100%;">
+            <span class="notif-icon">⚠️</span>
+            <span class="notif-msg" style="font-size: 13px; font-weight: 500; color: #1e293b;">{{ n.message }}</span>
+          </div>
+          
+          <!-- Recommendations Section -->
+          <div *ngIf="n.recommendations && n.recommendations.length > 0" style="margin-left: 28px; width: calc(100% - 28px); background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 4px;">
+            <div style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px; display: flex; align-items: center; gap: 4px;">
+              <span>💡</span> Smart Supplier Match (Daily Deal suggestions)
+            </div>
+            <div *ngFor="let rec of n.recommendations" style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 6px 0; border-bottom: 1px dashed #e2e8f0;">
+              <span style="color: #334155; font-weight: 600;">Rank #{{ rec.rank }} - {{ rec.supplier?.email }}</span>
+              <span style="color: #2563eb; font-weight: 700;">${{ rec.price | number:'1.2-2' }}</span>
+            </div>
+            <div style="margin-top: 8px; text-align: right;">
+              <a [routerLink]="['/retailer/supplier-match']" [queryParams]="{ productId: n.product?.id }" style="font-size: 11px; color: #2563eb; font-weight: 700; text-decoration: none; display: inline-block;">
+                Compare All Deals & Reorder →
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>

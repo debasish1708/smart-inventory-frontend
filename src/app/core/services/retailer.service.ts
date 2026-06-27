@@ -60,4 +60,12 @@ export class RetailerService {
   getSubscription(): Observable<ApiResponse<SubscriptionResponse>> {
     return this.http.get<ApiResponse<SubscriptionResponse>>(`${this.base}/subscription`);
   }
+
+  // Sales (POS)
+  submitSale(data: any): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.base}/sales`, data);
+  }
+  getSales(): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.base}/sales`);
+  }
 }

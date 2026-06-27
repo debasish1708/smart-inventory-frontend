@@ -1,0 +1,209 @@
+<app-layout pageTitle="Sales Portal / POS" [navItems]="nav" roleLabel="Retailer Portal">
+
+  <div class="pos-container">
+    
+    <!-- Left Column: Catalog -->
+    <div class="catalog-panel">
+      <div class="panel-header">
+        <h2>🛍️ Products Catalog</h2>
+        <div class="search-box">
+          <input 
+            type="text" 
+            [(ngModel)]="searchQuery" 
+            (ngModelChange)="filterProducts()" 
+            placeholder="Search by name, brand..."
+          />
+        </div>
+      </div>
+
+      <div *ngIf="loading" style="text-align: center; padding: 40px; color: #64748b;">
+        <span>⏳ Loading your inventory...</span>
+      </div>
+
+      <div *ngIf="!loading && filteredProducts.length === 0" style="text-align: center; padding: 40px; color: #64748b;">
+        <span>📭 No products found. Make sure you have added products to your Inventory!</span>
+      </div>
+
+      <div class="products-grid" *ngIf="!loading && filteredProducts.length > 0">
+        <div *ngFor="let item of filteredProducts" class="product-card">
+          <div>
+            <div class="product-category">{{ item.category || 'General' }}</div>
+            <h3 class="product-name">{{ item.productName }}</h3>
+            <div style="font-size: 12px; color: #64748b; margin-bottom: 6px;" *ngIf="item.brand">
+              Brand: {{ item.brand }}
+            </div>
+            <div style="font-size: 11px; color: #94a3b8; font-family: monospace;">
+              SKU: {{ item.sku }}
+            </div>
+          </div>
+
+          <div>
+            <div class="product-details">
+              <span class="product-price">${{ item.price | number:'1.2-2' }}</span>
+              <span 
+                class="product-stock"
+                [class.low]="item.quantity > 0 && item.quantity <= (item.thresholdValue || 10)"
+                [class.out]="item.quantity === 0"
+              >
+                {{ item.quantity === 0 ? 'Out of Stock' : (item.quantity + ' ' + (item.unit || 'units')) }}
+              </span>
+            </div>
+            
+            <button 
+              class="add-btn" 
+              (click)="addToCart(item)"
+              [disabled]="item.quantity === 0 || isCartLimitReached(item)"
+            >
+              <span>🛒</span> Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Cart -->
+    <div class="cart-panel">
+      <div class="cart-header">
+        <h2>🛒 Billing Cart</h2>
+        <span class="cart-count">{{ cart.length }} items</span>
+      </div>
+
+      <div class="cart-items">
+        <div *ngIf="cart.length === 0" class="empty-cart-state">
+          <span class="empty-cart-icon">🛍️</span>
+          <p>Cart is empty. Add products to get started.</p>
+        </div>
+
+        <div *ngFor="let item of cart" class="cart-item">
+          <div class="item-info">
+            <span class="item-title">{{ item.productName }}</span>
+            <span class="item-meta">${{ item.price | number:'1.2-2' }} / {{ item.unit || 'unit' }}</span>
+          </div>
+
+          <div class="item-actions">
+            <div class="qty-controls">
+              <button class="qty-btn" (click)="decreaseQty(item)">−</button>
+              <span class="qty-val">{{ item.qty }}</span>
+              <button class="qty-btn" (click)="increaseQty(item)">+</button>
+            </div>
+
+            <span class="item-subtotal">${{ (item.price * item.qty) | number:'1.2-2' }}</span>
+
+            <button class="remove-btn" (click)="removeFromCart(item)">🗑️</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary & Checkout -->
+      <div class="checkout-summary" *ngIf="cart.length > 0">
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span>${{ getCartTotal() | number:'1.2-2' }}</span>
+        </div>
+        <div class="summary-row">
+          <span>GST / Taxes (0%)</span>
+          <span>$0.00</span>
+        </div>
+        <div class="summary-row total">
+          <span>Grand Total</span>
+          <span class="val">${{ getCartTotal() | number:'1.2-2' }}</span>
+        </div>
+
+        <div style="margin-top: 16px;">
+          <span style="font-size: 13px; font-weight: 600; color: #475569;">Payment Method</span>
+          <div class="payment-options">
+            <button 
+              type="button" 
+              class="payment-btn" 
+              [class.active]="paymentMode === 'CASH'"
+              (click)="paymentMode = 'CASH'"
+            >
+              <span>💵</span> Cash
+            </button>
+            <button 
+              type="button" 
+              class="payment-btn" 
+              [class.active]="paymentMode === 'CARD'"
+              (click)="paymentMode = 'CARD'"
+            >
+              <span>💳</span> Card
+            </button>
+            <button 
+              type="button" 
+              class="payment-btn" 
+              [class.active]="paymentMode === 'UPI'"
+              (click)="paymentMode = 'UPI'"
+            >
+              <span>📱</span> UPI
+            </button>
+          </div>
+        </div>
+
+        <button 
+          class="checkout-btn" 
+          (click)="checkout()"
+          [disabled]="checkoutLoading"
+        >
+          {{ checkoutLoading ? '⚡ Processing Transaction...' : ('💳 Confirm Checkout - $' + (getCartTotal() | number:'1.2-2')) }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Receipt Success Modal -->
+  <div class="modal-overlay" *ngIf="receipt">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="success-icon">✅</span>
+        <h3>Transaction Complete</h3>
+      </div>
+      
+      <div class="receipt-body">
+        <div class="receipt-title">Smart Retailer Store</div>
+        <div style="text-align: center; font-size: 12px; color: #64748b; margin-bottom: 12px;">
+          Sales Invoice #{{ receipt.id }}
+        </div>
+        
+        <div class="receipt-meta">
+          <div>Date: {{ receipt.saleDate | date:'medium' }}</div>
+          <div>Cashier: {{ receipt.retailerEmail }}</div>
+          <div>Payment: {{ paymentMode }}</div>
+        </div>
+
+        <div class="receipt-items">
+          <div class="receipt-item-row" style="font-weight: bold; margin-bottom: 8px;">
+            <span>Item</span>
+            <span style="text-align: center;">Qty</span>
+            <span style="text-align: right;">Total</span>
+          </div>
+          
+          <div *ngFor="let item of receipt.items" class="receipt-item-row">
+            <span>{{ item.productName }}</span>
+            <span class="qty-price">{{ item.quantity }} x ${{ item.price | number:'1.2-2' }}</span>
+            <span class="tot">${{ (item.quantity * item.price) | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <div class="receipt-row bold">
+          <span>SUBTOTAL</span>
+          <span>${{ receipt.totalAmount | number:'1.2-2' }}</span>
+        </div>
+        <div class="receipt-row bold" style="font-size: 15px; margin-top: 6px;">
+          <span>GRAND TOTAL</span>
+          <span>${{ receipt.totalAmount | number:'1.2-2' }}</span>
+        </div>
+
+        <div class="receipt-footer">
+          <p>Thank you for shopping with us! 😊</p>
+          <p>Smart Inventory Platform</p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="modal-btn close" (click)="closeReceipt()">New Sale</button>
+        <button class="modal-btn print" (click)="printReceipt()">Print Invoice</button>
+      </div>
+    </div>
+  </div>
+
+</app-layout>

@@ -22,6 +22,7 @@ export const routes: Routes = [
       { path: 'dashboard',      loadComponent: () => import('./features/retailer/dashboard/retailer-dashboard.component').then(m => m.RetailerDashboardComponent) },
       { path: 'inventory',      loadComponent: () => import('./features/retailer/inventory/retailer-inventory.component').then(m => m.RetailerInventoryComponent) },
       { path: 'orders',         loadComponent: () => import('./features/retailer/orders/retailer-orders.component').then(m => m.RetailerOrdersComponent) },
+      { path: 'sales',          loadComponent: () => import('./features/retailer/sales/retailer-sales.component').then(m => m.RetailerSalesComponent) },
       { path: 'supplier-match', loadComponent: () => import('./features/retailer/supplier-match/supplier-match.component').then(m => m.SupplierMatchComponent) },
       { path: 'ratings',        loadComponent: () => import('./features/retailer/ratings/retailer-ratings.component').then(m => m.RetailerRatingsComponent) },
       { path: 'analytics',      loadComponent: () => import('./features/retailer/analytics/retailer-analytics.component').then(m => m.RetailerAnalyticsComponent) },
