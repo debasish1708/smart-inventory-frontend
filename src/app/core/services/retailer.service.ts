@@ -27,6 +27,9 @@ export class RetailerService {
   getOrders(): Observable<ApiResponse<Order[]>> {
     return this.http.get<ApiResponse<Order[]>>(`${this.base}/orders`);
   }
+  createOrder(data: any): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.base}/orders`, data);
+  }
 
   // Products Autocomplete
   getProducts(): Observable<ApiResponse<any[]>> {
@@ -59,6 +62,9 @@ export class RetailerService {
   // Subscription
   getSubscription(): Observable<ApiResponse<SubscriptionResponse>> {
     return this.http.get<ApiResponse<SubscriptionResponse>>(`${this.base}/subscription`);
+  }
+  upgradeSubscription(planName: string): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.base}/subscription/upgrade?plan=${planName}`, {});
   }
 
   // Sales (POS)

@@ -1,4 +1,8 @@
 <app-layout pageTitle="Subscription" [navItems]="nav" roleLabel="Supplier Portal">
+  <div *ngIf="upgradeSuccess" class="alert alert-success" style="margin-bottom: 20px; padding: 12px; border-radius: 8px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46;">
+    🎉 Subscription upgraded to <strong>{{ selectedPlanName }}</strong> successfully!
+  </div>
+
   <div class="card" *ngIf="current">
     <div class="card-title">💳 Current Plan</div>
     <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
@@ -15,7 +19,10 @@
         <div class="plan-name" [style.color]="p.color">{{ p.name }}</div>
         <div class="plan-price"><span *ngIf="p.price===0">Free</span><span *ngIf="p.price>0">₹{{ p.price }}<small>/mo</small></span></div>
         <ul class="plan-features"><li *ngFor="let f of p.features">{{ f }}</li></ul>
-        <button class="btn-primary" [disabled]="isActive(p.name)" [style.background]="p.color">{{ isActive(p.name)?'Active':'Upgrade' }}</button>
+        <button class="btn-primary" [disabled]="isActive(p.name) || (upgradeLoading && selectedPlanName === p.name)" [style.background]="p.color" (click)="upgrade(p.name)">
+          <span *ngIf="upgradeLoading && selectedPlanName === p.name">Upgrading...</span>
+          <span *ngIf="!(upgradeLoading && selectedPlanName === p.name)">{{ isActive(p.name)?'Active':'Upgrade' }}</span>
+        </button>
       </div>
     </div>
   </div>

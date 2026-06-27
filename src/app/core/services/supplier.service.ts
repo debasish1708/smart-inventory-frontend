@@ -45,6 +45,9 @@ export class SupplierService {
   getSubscription(): Observable<ApiResponse<SubscriptionResponse>> {
     return this.http.get<ApiResponse<SubscriptionResponse>>(`${this.base}/subscription`);
   }
+  upgradeSubscription(planName: string): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.base}/subscription/upgrade?plan=${planName}`, {});
+  }
 
   // Report
   getReport(): Observable<ApiResponse<Order[]>> {

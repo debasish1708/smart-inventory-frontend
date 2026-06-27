@@ -17,7 +17,39 @@ export class RetailerSubscriptionComponent implements OnInit {
     { name:'BASIC', price:499, features:['Up to 500 inventory items','Advanced supplier match','Priority support','Order management'], color:'#1565c0' },
     { name:'PREMIUM', price:1499, features:['Unlimited inventory','AI-powered supplier match','Dedicated account manager','Full analytics','API access'], color:'#6a1b9a' },
   ];
+  upgradeLoading = false;
+  upgradeSuccess = false;
+  selectedPlanName = '';
+
   constructor(private svc: RetailerService) {}
-  ngOnInit() { this.svc.getSubscription().subscribe({ next:r=>{ this.loading=false; if(r.success) this.current=r.data; }, error:()=>this.loading=false }); }
+  ngOnInit() { this.load(); }
+  
+  load() {
+    this.loading = true;
+    this.svc.getSubscription().subscribe({
+      next: r => { this.loading = false; if (r.success) this.current = r.data; },
+      error: () => this.loading = false
+    });
+  }
+
   isActive(name:string) { return this.current?.planName === name; }
+
+  upgrade(planName: string) {
+    this.selectedPlanName = planName;
+    this.upgradeLoading = true;
+    this.upgradeSuccess = false;
+    this.svc.upgradeSubscription(planName).subscribe({
+      next: r => {
+        this.upgradeLoading = false;
+        if (r.success) {
+          this.upgradeSuccess = true;
+          this.load();
+          setTimeout(() => this.upgradeSuccess = false, 3000);
+        }
+      },
+      error: () => {
+        this.upgradeLoading = false;
+      }
+    });
+  }
 }

@@ -12,6 +12,9 @@ export class AdminService {
   getStats(): Observable<ApiResponse<AdminStats>> {
     return this.http.get<ApiResponse<AdminStats>>(`${this.baseUrl}/stats`);
   }
+  getAnalytics(): Observable<ApiResponse<any>> {
+    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/analytics`);
+  }
 
   getAllUsers(): Observable<ApiResponse<AdminUser[]>> {
     return this.http.get<ApiResponse<AdminUser[]>>(`${this.baseUrl}/all-users-raw`);

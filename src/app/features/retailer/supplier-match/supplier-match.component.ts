@@ -253,6 +253,76 @@ export class SupplierMatchComponent implements OnInit {
     return Math.round(score);
   }
 
+  // Simulated payment modal state variables
+  buyModalOpen = false;
+  selectedMatchForBuy: any = null;
+  buyQty = 1;
+  payLoading = false;
+  paySuccess = false;
+  toastMsg = '';
+  toastTyp = 'success';
+
+  openBuyModal(item: any) {
+    this.selectedMatchForBuy = item;
+    this.buyQty = item.moq || 1;
+    this.buyModalOpen = true;
+    this.payLoading = false;
+    this.paySuccess = false;
+  }
+
+  closeBuyModal() {
+    this.buyModalOpen = false;
+    this.selectedMatchForBuy = null;
+  }
+
+  increaseQty() {
+    this.buyQty++;
+  }
+
+  decreaseQty() {
+    if (this.buyQty > (this.selectedMatchForBuy?.moq || 1)) {
+      this.buyQty--;
+    }
+  }
+
+  executePayment() {
+    if (!this.selectedMatchForBuy) return;
+    this.payLoading = true;
+    setTimeout(() => {
+      const payload = {
+        supplierId: this.selectedMatchForBuy.supplierId,
+        productId: this.selectedMatchForBuy.productId,
+        quantity: this.buyQty,
+        price: this.selectedMatchForBuy.price,
+        unit: 'units'
+      };
+      this.svc.createOrder(payload).subscribe({
+        next: r => {
+          this.payLoading = false;
+          if (r.success) {
+            this.paySuccess = true;
+            this.showToast('Payment successful & order placed!');
+            setTimeout(() => {
+              this.closeBuyModal();
+            }, 1500);
+          } else {
+            this.showToast(r.message || 'Payment simulation failed', 'error');
+          }
+        },
+        error: err => {
+          this.payLoading = false;
+          this.showToast(err.error?.message || 'Transaction failed', 'error');
+        }
+      });
+    }, 2000); // 2 seconds simulated payment delay
+  }
+
+  showToast(msg: string, type = 'success') {
+    this.toastMsg = msg;
+    this.toastTyp = type;
+    setTimeout(() => this.toastMsg = '', 3000);
+  }
+
   stars(r: number) {
     return '★'.repeat(Math.round(r)) + '☆'.repeat(5 - Math.round(r));
   }
