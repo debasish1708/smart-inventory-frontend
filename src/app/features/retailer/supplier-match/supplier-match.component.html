@@ -42,58 +42,101 @@
     </div>
   </div>
 
-  <!-- Smart Suggestion Highlighting Banner -->
-  <div class="card smart-suggestion-banner" *ngIf="!loading && bestMatch" style="border: 2px solid #10b981; background: #ecfdf5; border-radius: 14px; margin-bottom: 24px; padding: 22px; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.1);">
-    <div class="badge badge-active" style="background: #10b981; color: white; margin-bottom: 12px; font-size: 11px; padding: 4px 10px; border-radius: 20px;">🏆 RECOMMENDED BEST SUPPLIER</div>
-    <h3 style="color: #065f46; font-size: 18px; font-weight: 800; margin-bottom: 8px;">
-      Empowered Suggestion: {{ bestMatch.supplierName }}
-    </h3>
-    <p style="font-size: 13.5px; color: #047857; line-height: 1.65; margin-bottom: 14px;">
-      Recommended choice for <strong>{{ bestMatch.productName }}</strong>. It delivers the most optimized entry order cost of <strong>₹{{ bestMatch.minOrderCost | number:'1.0-0' }}</strong> (Price: ₹{{ bestMatch.price }} * MOQ: {{ bestMatch.moq }}), high rating of <strong>{{ bestMatch.rating | number:'1.1-1' }} ★</strong>, and immediate availability by <strong>{{ bestMatch.availabilityDate | date:'dd MMM yyyy' }}</strong> ({{ bestMatch.leadTime }} day lead time).
-    </p>
-    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-      <span style="font-size: 12px; font-weight: 750; color: #065f46; background: #d1fae5; padding: 5px 12px; border-radius: 20px; border: 1px solid #a7f3d0;">Match Index: {{ bestMatch.recommendationScore }}%</span>
-      <button class="btn-sm btn-success" (click)="openBuyModal(bestMatch)" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;">💳 Buy Now</button>
+  <!-- Premium Loading State -->
+  <div *ngIf="loading" class="ai-loader-container" style="margin-top: 24px;">
+    <!-- AI Analysis Status Card -->
+    <div class="ai-status-card">
+      <div class="ai-radar-wrapper">
+        <div class="ai-radar-ring ring-1"></div>
+        <div class="ai-radar-ring ring-2"></div>
+        <div class="ai-radar-ring ring-3"></div>
+        <div class="ai-icon-core">🤖</div>
+      </div>
+      <div class="ai-status-content">
+        <h3 class="ai-status-title">AI Supplier Evaluator</h3>
+        <p class="ai-status-text">{{ currentLoadingStage }}</p>
+        <div class="ai-progress-bar">
+          <div class="ai-progress-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skeleton Grid Loader -->
+    <div class="match-grid" style="margin-top: 24px; opacity: 0.7;">
+      <div class="skeleton-card" *ngFor="let i of [1, 2, 3]">
+        <div class="skeleton-header">
+          <div class="skeleton-avatar skeleton-shimmer"></div>
+          <div class="skeleton-header-text">
+            <div class="skeleton-line skeleton-title skeleton-shimmer"></div>
+            <div class="skeleton-line skeleton-subtitle skeleton-shimmer"></div>
+          </div>
+        </div>
+        <div class="skeleton-line skeleton-product skeleton-shimmer"></div>
+        <div class="skeleton-stats">
+          <div class="skeleton-stat-box skeleton-shimmer"></div>
+          <div class="skeleton-stat-box skeleton-shimmer"></div>
+          <div class="skeleton-stat-box skeleton-shimmer"></div>
+          <div class="skeleton-stat-box skeleton-shimmer"></div>
+        </div>
+        <div class="skeleton-footer">
+          <div class="skeleton-line skeleton-footer-line skeleton-shimmer"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div *ngIf="loading" class="empty-state card"><div class="empty-icon">🔍</div><p>Searching suppliers…</p></div>
-
-  <div *ngIf="!loading && filtered.length === 0" class="empty-state card">
-    <div class="empty-icon">🤷</div><p>No matching suppliers found. Try a different product name.</p>
-  </div>
-
-  <div class="match-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-    <div class="match-card" *ngFor="let m of filtered" [style.border]="m === bestMatch ? '2px solid #10b981' : '1px solid #e5e7eb'" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative;">
-      <div *ngIf="m === bestMatch" style="position: absolute; top: -12px; right: 15px; background: #10b981; color: white; padding: 3px 10px; font-size: 10px; font-weight: 750; border-radius: 20px; text-transform: uppercase;">Best Match</div>
-      <div class="match-header" style="display: flex; gap: 12px; align-items: center; margin-bottom: 14px;">
-        <div class="supplier-avatar" style="width: 44px; height: 44px; border-radius: 50%; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">{{ m.supplierName?.charAt(0) }}</div>
-        <div>
-          <div class="supplier-name" style="font-weight: 700; color: #1e293b; font-size: 15px;">{{ m.supplierName }}</div>
-          <div class="business-name" style="color: #64748b; font-size: 12px;">{{ m.businessName }}</div>
-        </div>
+  <ng-container *ngIf="!loading">
+    <!-- Smart Suggestion Highlighting Banner -->
+    <div class="card smart-suggestion-banner" *ngIf="bestMatch" style="border: 2px solid #10b981; background: #ecfdf5; border-radius: 14px; margin-bottom: 24px; padding: 22px; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.1);">
+      <div class="badge badge-active" style="background: #10b981; color: white; margin-bottom: 12px; font-size: 11px; padding: 4px 10px; border-radius: 20px;">🏆 RECOMMENDED BEST SUPPLIER</div>
+      <h3 style="color: #065f46; font-size: 18px; font-weight: 800; margin-bottom: 8px;">
+        Empowered Suggestion: {{ bestMatch.supplierName }}
+      </h3>
+      <p style="font-size: 13.5px; color: #047857; line-height: 1.65; margin-bottom: 14px;">
+        Recommended choice for <strong>{{ bestMatch.productName }}</strong>. It delivers the most optimized entry order cost of <strong>₹{{ bestMatch.minOrderCost | number:'1.0-0' }}</strong> (Price: ₹{{ bestMatch.price }} * MOQ: {{ bestMatch.moq }}), high rating of <strong>{{ bestMatch.rating | number:'1.1-1' }} ★</strong>, and immediate availability by <strong>{{ bestMatch.availabilityDate | date:'dd MMM yyyy' }}</strong> ({{ bestMatch.leadTime }} day lead time).
+      </p>
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+        <span style="font-size: 12px; font-weight: 750; color: #065f46; background: #d1fae5; padding: 5px 12px; border-radius: 20px; border: 1px solid #a7f3d0;">Match Index: {{ bestMatch.recommendationScore }}%</span>
+        <button class="btn-sm btn-success" (click)="openBuyModal(bestMatch)" style="background: #10b981; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer;">💳 Buy Now</button>
       </div>
-      <div class="match-product" style="font-weight: 600; color: #1e3a8a; font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 4px;">📦 {{ m.productName }}</div>
-      
-      <div class="match-stats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-        <div class="mstat" style="display: flex; flex-direction: column; background: #f8fafc; padding: 6px 10px; border-radius: 6px;"><span class="mstat-val" style="font-weight: 700; color: #334155; font-size: 13.5px;">₹{{ m.price }}</span><span class="mstat-lbl" style="font-size: 10px; color: #94a3b8;">Per Unit</span></div>
-        <div class="mstat" style="display: flex; flex-direction: column; background: #f8fafc; padding: 6px 10px; border-radius: 6px;"><span class="mstat-val" style="font-weight: 700; color: #334155; font-size: 13.5px;">{{ m.moq }} units</span><span class="mstat-lbl" style="font-size: 10px; color: #94a3b8;">Min Order (MOQ)</span></div>
-        <div class="mstat" style="display: flex; flex-direction: column; background: #ecfdf5; padding: 6px 10px; border-radius: 6px; grid-column: span 2; border: 1px solid #d1fae5;"><span class="mstat-val" style="font-weight: 800; color: #047857; font-size: 14.5px;">₹{{ m.minOrderCost | number:'1.0-0' }}</span><span class="mstat-lbl" style="font-size: 10px; color: #059669;">Min Cost (Price * MOQ)</span></div>
-        <div class="mstat" style="display: flex; flex-direction: column; background: #f8fafc; padding: 6px 10px; border-radius: 6px;"><span class="mstat-val" style="font-weight: 700; color: #334155; font-size: 13.5px;">{{ m.stockQuantity }}</span><span class="mstat-lbl" style="font-size: 10px; color: #94a3b8;">Available Stock</span></div>
-        <div class="mstat" style="display: flex; flex-direction: column; background: #f8fafc; padding: 6px 10px; border-radius: 6px;"><span class="mstat-val" style="font-weight: 700; color: #334155; font-size: 13.5px;">{{ m.leadTime }} days</span><span class="mstat-lbl" style="font-size: 10px; color: #94a3b8;">Lead Time</span></div>
-        <div class="mstat" style="display: flex; flex-direction: column; background: #eff6ff; padding: 6px 10px; border-radius: 6px; grid-column: span 2; border: 1px solid #dbeafe; text-align: center;"><span class="mstat-val" style="font-weight: 700; color: #1e40af; font-size: 13px;">📅 {{ m.availabilityDate | date:'dd MMM yyyy' }}</span><span class="mstat-lbl" style="font-size: 9px; color: #1d4ed8; text-transform: uppercase;">Availability Date</span></div>
-      </div>
-
-      <div class="match-rating" style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px dashed #f0f2f5; margin-bottom: 12px;">
-        <div>
-          <span class="stars" style="color: #f57c00; font-size: 13px;">{{ stars(m.rating) }}</span>
-          <span class="rating-num" style="font-size: 11px; font-weight: 600; color: #64748b; margin-left: 4px;">{{ m.rating | number:'1.1-1' }}/5</span>
-        </div>
-        <span style="font-size: 11px; font-weight: 750; color: #2563eb; background: #dbeafe; padding: 3px 8px; border-radius: 12px;">Score: {{ m.recommendationScore }}%</span>
-      </div>
-      <button class="btn-primary" (click)="openBuyModal(m)" style="margin-top:4px; width: 100%;">💳 Buy Now</button>
     </div>
-  </div>
+
+    <div *ngIf="filtered.length === 0" class="empty-state card">
+      <div class="empty-icon">🤷</div><p>No matching suppliers found. Try a different product name.</p>
+    </div>
+
+    <div class="match-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+      <div class="match-card" *ngFor="let m of filtered" [style.border]="m === bestMatch ? '2px solid #10b981' : '1px solid #e5e7eb'" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative;">
+        <div *ngIf="m === bestMatch" style="position: absolute; top: -12px; right: 15px; background: #10b981; color: white; padding: 3px 10px; font-size: 10px; font-weight: 750; border-radius: 20px; text-transform: uppercase;">Best Match</div>
+        <div class="match-header" style="display: flex; gap: 12px; align-items: center; margin-bottom: 14px;">
+          <div class="supplier-avatar" style="width: 44px; height: 44px; border-radius: 50%; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">{{ m.supplierName?.charAt(0) }}</div>
+          <div>
+            <div class="supplier-name" style="font-weight: 700; color: #1e293b; font-size: 15px;">{{ m.supplierName }}</div>
+            <div class="business-name" style="color: #64748b; font-size: 12px;">{{ m.businessName }}</div>
+          </div>
+        </div>
+        <div class="match-product" style="font-weight: 600; color: #1e3a8a; font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 4px;">📦 {{ m.productName }}</div>
+        
+        <div class="match-stats" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+          <div class="mstat" style="display: flex; flex-direction: column; background: #f8fafc; padding: 6px 10px; border-radius: 6px;"><span class="mstat-val" style="font-weight: 700; color: #334155; font-size: 13.5px;">₹{{ m.price }}</span><span class="mstat-lbl" style="font-size: 10px; color: #94a3b8;">Per Unit</span></div>
+          <div class="mstat" style="display: flex; flex-direction: column; background: #f8fafc; padding: 6px 10px; border-radius: 6px;"><span class="mstat-val" style="font-weight: 700; color: #334155; font-size: 13.5px;">{{ m.moq }} units</span><span class="mstat-lbl" style="font-size: 10px; color: #94a3b8;">Min Order (MOQ)</span></div>
+          <div class="mstat" style="display: flex; flex-direction: column; background: #ecfdf5; padding: 6px 10px; border-radius: 6px; grid-column: span 2; border: 1px solid #d1fae5;"><span class="mstat-val" style="font-weight: 800; color: #047857; font-size: 14.5px;">₹{{ m.minOrderCost | number:'1.0-0' }}</span><span class="mstat-lbl" style="font-size: 10px; color: #059669;">Min Cost (Price * MOQ)</span></div>
+          <div class="mstat" style="display: flex; flex-direction: column; background: #f8fafc; padding: 6px 10px; border-radius: 6px;"><span class="mstat-val" style="font-weight: 700; color: #334155; font-size: 13.5px;">{{ m.stockQuantity }}</span><span class="mstat-lbl" style="font-size: 10px; color: #94a3b8;">Available Stock</span></div>
+          <div class="mstat" style="display: flex; flex-direction: column; background: #f8fafc; padding: 6px 10px; border-radius: 6px;"><span class="mstat-val" style="font-weight: 700; color: #334155; font-size: 13.5px;">{{ m.leadTime }} days</span><span class="mstat-lbl" style="font-size: 10px; color: #94a3b8;">Lead Time</span></div>
+          <div class="mstat" style="display: flex; flex-direction: column; background: #eff6ff; padding: 6px 10px; border-radius: 6px; grid-column: span 2; border: 1px solid #dbeafe; text-align: center;"><span class="mstat-val" style="font-weight: 700; color: #1e40af; font-size: 13px;">📅 {{ m.availabilityDate | date:'dd MMM yyyy' }}</span><span class="mstat-lbl" style="font-size: 9px; color: #1d4ed8; text-transform: uppercase;">Availability Date</span></div>
+        </div>
+
+        <div class="match-rating" style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px dashed #f0f2f5; margin-bottom: 12px;">
+          <div>
+            <span class="stars" style="color: #f57c00; font-size: 13px;">{{ stars(m.rating) }}</span>
+            <span class="rating-num" style="font-size: 11px; font-weight: 600; color: #64748b; margin-left: 4px;">{{ m.rating | number:'1.1-1' }}/5</span>
+          </div>
+          <span style="font-size: 11px; font-weight: 750; color: #2563eb; background: #dbeafe; padding: 3px 8px; border-radius: 12px;">Score: {{ m.recommendationScore }}%</span>
+        </div>
+        <button class="btn-primary" (click)="openBuyModal(m)" style="margin-top:4px; width: 100%;">💳 Buy Now</button>
+      </div>
+    </div>
+  </ng-container>
 
   <!-- Toast Notification -->
   <div *ngIf="toastMsg" class="alert-toast" [class.alert-toast-error]="toastTyp === 'error'">

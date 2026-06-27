@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
@@ -13,14 +13,63 @@ import { RETAILER_NAV } from '../retailer.nav';
   templateUrl: './supplier-match.component.html',
   styleUrls: ['./supplier-match.component.css']
 })
-export class SupplierMatchComponent implements OnInit {
+export class SupplierMatchComponent implements OnInit, OnDestroy {
   nav = RETAILER_NAV;
   matches: any[] = [];
   filtered: any[] = [];
   searchProduct = '';
-  loading = false;
   error = '';
   sortBy = 'smart'; // Default sorting is smart recommendation!
+
+  // Premium loading state controls
+  private _loading = false;
+  currentLoadingStage = 'Initializing smart matcher...';
+  private loadingStages = [
+    'Connecting to AI matcher agent...',
+    'Fetching relevant supplier records...',
+    'Analyzing MOQ structures and shipping costs...',
+    'Comparing prices and calculating savings...',
+    'Evaluating delivery lead times...',
+    'Analyzing seller ratings & transaction history...',
+    'Finalizing optimal recommendations...'
+  ];
+  private loadingInterval: any = null;
+
+  get loading(): boolean {
+    return this._loading;
+  }
+
+  set loading(val: boolean) {
+    this._loading = val;
+    if (val) {
+      this.startLoadingSimulation();
+    } else {
+      this.stopLoadingSimulation();
+    }
+  }
+
+  startLoadingSimulation() {
+    this.currentLoadingStage = this.loadingStages[0];
+    let index = 0;
+    if (this.loadingInterval) {
+      clearInterval(this.loadingInterval);
+    }
+    this.loadingInterval = setInterval(() => {
+      index = (index + 1) % this.loadingStages.length;
+      this.currentLoadingStage = this.loadingStages[index];
+    }, 900);
+  }
+
+  stopLoadingSimulation() {
+    if (this.loadingInterval) {
+      clearInterval(this.loadingInterval);
+      this.loadingInterval = null;
+    }
+  }
+
+  ngOnDestroy() {
+    this.stopLoadingSimulation();
+  }
 
   bestMatch: any = null; // Highlighting the top suggested supplier
 
@@ -85,18 +134,27 @@ export class SupplierMatchComponent implements OnInit {
 
   loadAll() {
     this.loading = true;
+    const startTime = Date.now();
     this.svc.getAllSupplierMatches().subscribe({
       next: r => {
-        this.loading = false;
-        if (r.success) {
-          this.matches = r.data;
-          this.apply();
-        }
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, 1500 - elapsed);
+        setTimeout(() => {
+          this.loading = false;
+          if (r.success) {
+            this.matches = r.data;
+            this.apply();
+          }
+        }, remaining);
       },
       error: () => {
-        this.loading = false;
-        this.matches = this.getMockData();
-        this.apply();
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, 1500 - elapsed);
+        setTimeout(() => {
+          this.loading = false;
+          this.matches = this.getMockData();
+          this.apply();
+        }, remaining);
       }
     });
   }
@@ -124,18 +182,27 @@ export class SupplierMatchComponent implements OnInit {
     }
 
     this.loading = true;
+    const startTime = Date.now();
     this.svc.getSupplierMatches(this.selectedProductId).subscribe({
       next: r => {
-        this.loading = false;
-        if (r.success) {
-          this.matches = r.data;
-          this.apply();
-        }
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, 1500 - elapsed);
+        setTimeout(() => {
+          this.loading = false;
+          if (r.success) {
+            this.matches = r.data;
+            this.apply();
+          }
+        }, remaining);
       },
       error: () => {
-        this.loading = false;
-        // Local filtering from mock/all data as fallback
-        this.apply();
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, 1500 - elapsed);
+        setTimeout(() => {
+          this.loading = false;
+          // Local filtering from mock/all data as fallback
+          this.apply();
+        }, remaining);
       }
     });
   }
