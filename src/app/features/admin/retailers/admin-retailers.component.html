@@ -14,7 +14,16 @@
         <thead><tr><th>#</th><th>Email</th><th>Profile</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
         <tbody>
           <tr *ngFor="let u of filtered; let i=index">
-            <td>{{ i+1 }}</td><td>{{ u.email }}</td>
+            <td>{{ i+1 }}</td>
+            <td>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 32px; height: 32px; min-width: 32px; border-radius: 50%; overflow: hidden; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #475569; border: 1px solid #cbd5e1; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                  <img *ngIf="u.profileImageUrl" [src]="getImgUrl(u.profileImageUrl)" style="width: 100%; height: 100%; object-fit: cover;" />
+                  <span *ngIf="!u.profileImageUrl">{{ getInitials(u.email) }}</span>
+                </div>
+                <span>{{ u.email }}</span>
+              </div>
+            </td>
             <td>{{ u.profileStatus }}</td>
             <td><span class="badge" [class]="'badge-'+u.status.toLowerCase()">{{ u.status }}</span></td>
             <td>{{ u.createdAt | date:'dd MMM yyyy' }}</td>

@@ -7,8 +7,9 @@
 
   <ng-container *ngIf="!loading && profile">
     <div class="card profile-hero">
-      <div class="hero-avatar" [class]="profile.role==='SUPPLIER'?'avatar-supplier':'avatar-retailer'">
-        {{ (profile.firstName ? profile.firstName[0] : profile.email[0]).toUpperCase() }}
+      <div class="hero-avatar" [class]="profile.role==='SUPPLIER'?'avatar-supplier':'avatar-retailer'" style="position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+        <img *ngIf="profile?.profileImageUrl" [src]="getImgUrl(profile.profileImageUrl)" style="width:100%; height:100%; object-fit:cover;" />
+        <span *ngIf="!profile?.profileImageUrl">{{ (profile.firstName ? profile.firstName[0] : profile.email[0]).toUpperCase() }}</span>
       </div>
       <div class="hero-info">
         <h2>{{ profile.firstName ? profile.firstName+' '+profile.lastName : '—' }}</h2>

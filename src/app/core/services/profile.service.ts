@@ -29,4 +29,16 @@ export class ProfileService {
   updateProfile(req: UpdateProfileRequest): Observable<ApiResponse<ProfileResponse>> {
     return this.http.put<ApiResponse<ProfileResponse>>(`${this.baseUrl}/update`, req);
   }
+
+  uploadProfileImage(file: File): Observable<ApiResponse<ProfileResponse>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<ApiResponse<ProfileResponse>>(`${this.baseUrl}/upload-image`, formData);
+  }
+
+  getProfileImageUrl(role: string, filename: string): string {
+    if (!filename) return '';
+    const subFolder = role.toLowerCase() === 'retailer' ? 'retailers' : 'suppliers';
+    return `${this.baseUrl}/image/${subFolder}/${filename}`;
+  }
 }

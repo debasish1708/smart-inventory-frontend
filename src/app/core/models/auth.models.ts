@@ -18,6 +18,7 @@ export interface ProfileResponse {
 export interface AdminUser {
   id: number; email: string; role: string; status: string;
   profileStatus: string; createdAt: string;
+  profileImageUrl?: string;
 }
 export interface AdminStats { total: number; pending: number; active: number; blocked: number; }
 
