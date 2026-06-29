@@ -4,12 +4,13 @@ import { RouterLink } from '@angular/router';
 import { LayoutComponent } from '../../../shared/components/layout/layout.component';
 import { RetailerService } from '../../../core/services/retailer.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { FormsModule } from '@angular/forms';
 import { RETAILER_NAV } from '../retailer.nav';
 
 @Component({
   selector: 'app-retailer-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, LayoutComponent],
+  imports: [CommonModule, RouterLink, LayoutComponent, FormsModule],
   templateUrl: './retailer-dashboard.component.html',
   styleUrls: ['./retailer-dashboard.component.css']
 })

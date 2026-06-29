@@ -35,9 +35,9 @@ export class RetailerRatingsComponent implements OnInit {
   stars(n:number){ return '★'.repeat(n)+'☆'.repeat(5-n); }
   mock() {
     return [
-      { id:1, supplierEmail:'ravi@supplier.com', rating:5, review:'Excellent quality and fast delivery!', createdAt:'2025-01-10' },
-      { id:2, supplierEmail:'sharma@supplier.com', rating:4, review:'Good product, slight delay in delivery.', createdAt:'2025-01-18' },
-      { id:3, supplierEmail:'green@supplier.com', rating:4, review:'Reliable supplier, will order again.', createdAt:'2025-02-02' },
+      { id:1, supplierEmail:'ravi@supplier.com', rating:5, review:'Excellent quality and fast delivery!', createdAt:'2025-01-10', images: ['sample_rating_1.jpg', 'sample_rating_2.jpg'] },
+      { id:2, supplierEmail:'sharma@supplier.com', rating:4, review:'Good product, slight delay in delivery.', createdAt:'2025-01-18', images: ['sample_rating_3.jpg'] },
+      { id:3, supplierEmail:'green@supplier.com', rating:4, review:'Reliable supplier, will order again.', createdAt:'2025-02-02', images: [] },
     ];
   }
 }

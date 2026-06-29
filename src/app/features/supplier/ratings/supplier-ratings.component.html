@@ -1,39 +1,174 @@
 <app-layout pageTitle="My Ratings" [navItems]="nav" roleLabel="Supplier Portal">
-  <div class="card">
-    <div class="card-title">⭐ My Performance Rating</div>
-    <div class="rating-overview">
-      <div class="big-rating">
-        <span class="big-num">{{ avgRating }}</span>
-        <div class="stars">{{ stars(avgRating) }}</div>
-        <span style="font-size:13px;color:#888">Based on {{ ratings.length }} reviews</span>
-      </div>
-      <div class="rating-dist">
-        <div class="dist-row" *ngFor="let n of [5,4,3,2,1]">
-          <span class="dist-num">{{ n }}★</span>
-          <div class="dist-bar-outer"><div class="dist-bar-inner" [style.width.%]="dist(n)"></div></div>
-          <span class="dist-pct">{{ dist(n) }}%</span>
+  <!-- Loading state -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner-large"></div>
+    <p>Loading ratings & reviews...</p>
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- Performance Overview Dashboard Card -->
+    <div class="card overview-card">
+      <div class="card-title">⭐ Performance Overview</div>
+      <div class="overview-grid">
+        <div class="overview-section big-rating-col">
+          <span class="big-rating-num">{{ avgRating }}</span>
+          <div class="stars-large">{{ stars(avgRating) }}</div>
+          <span class="reviews-count">Based on {{ ratings.length }} reviews</span>
+          <div class="verified-badge-main">
+            <span class="verified-icon">🛡️</span> Verified Retailer Feedback
+          </div>
+        </div>
+
+        <div class="overview-section distribution-col">
+          <div class="dist-row" *ngFor="let n of [5,4,3,2,1]" (click)="selectedStarFilter = selectedStarFilter === n.toString() ? 'all' : n.toString()" [class.active-filter]="selectedStarFilter === n.toString()">
+            <span class="dist-num">{{ n }}★</span>
+            <div class="dist-bar-outer">
+              <div class="dist-bar-inner" [style.width.%]="dist(n)" [ngClass]="'bar-' + n"></div>
+            </div>
+            <span class="dist-pct">{{ dist(n) }}%</span>
+          </div>
+        </div>
+
+        <div class="overview-section stats-col">
+          <div class="stat-mini-card">
+            <div class="stat-mini-icon bg-green-light">📈</div>
+            <div class="stat-mini-info">
+              <h4>{{ getPositivePercentage() }}%</h4>
+              <p>Positive Feedback (4★+)</p>
+            </div>
+          </div>
+          <div class="stat-mini-card">
+            <div class="stat-mini-icon bg-blue-light">📷</div>
+            <div class="stat-mini-info">
+              <h4>{{ getReviewsWithImagesCount() }}</h4>
+              <p>Reviews with Photos</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="ratings-list">
-    <div class="rating-card" *ngFor="let r of ratings">
-      <div class="rating-header">
-        <div class="rater-avatar">{{ r.retailerEmail?.charAt(0).toUpperCase() }}</div>
-        <div><div class="rater-name">{{ r.retailerEmail }}</div><div class="stars" style="font-size:15px">{{ stars(r.rating) }}</div></div>
-        <div class="rating-date">{{ r.createdAt | date:'dd MMM yyyy' }}</div>
+
+    <!-- Filter & Sort Toolbar -->
+    <div class="toolbar-card">
+      <div class="filter-pills">
+        <button class="pill-btn" [class.active]="selectedStarFilter === 'all'" (click)="selectedStarFilter = 'all'">
+          All Reviews
+        </button>
+        <button class="pill-btn" *ngFor="let n of [5,4,3,2,1]" [class.active]="selectedStarFilter === n.toString()" (click)="selectedStarFilter = n.toString()">
+          {{ n }}★ ({{ getRatingCount(n) }})
+        </button>
       </div>
-      <p class="review-text">{{ r.review }}</p>
-      
-      <!-- Review images -->
-      <div *ngIf="r.images && r.images.length > 0" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
-        <a *ngFor="let img of r.images" [href]="getRatingImgUrl(img)" target="_blank" style="display: block;">
-          <img [src]="getRatingImgUrl(img)" 
-               style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; transition: transform 0.2s;"
-               title="Click to view full size" />
-        </a>
+
+      <div class="toolbar-actions">
+        <label class="toggle-container">
+          <input type="checkbox" [(ngModel)]="onlyWithImages">
+          <span class="toggle-label">📷 Photos Only</span>
+        </label>
+
+        <div class="sort-selector">
+          <span class="sort-label">Sort:</span>
+          <select [(ngModel)]="sortBy" class="modern-select">
+            <option value="newest">Newest First</option>
+            <option value="highest">Highest Rating</option>
+            <option value="lowest">Lowest Rating</option>
+          </select>
+        </div>
       </div>
     </div>
-    <div *ngIf="ratings.length===0" class="empty-state card"><div class="empty-icon">⭐</div><p>No ratings yet</p></div>
+
+    <!-- Active Filter Info -->
+    <div class="active-filter-banner" *ngIf="selectedStarFilter !== 'all' || onlyWithImages">
+      <span>Showing filtered results ({{ getFilteredRatings().length }} of {{ ratings.length }} reviews)</span>
+      <button class="btn-clear-filters" (click)="selectedStarFilter = 'all'; onlyWithImages = false">Reset Filters</button>
+    </div>
+
+    <!-- Reviews List -->
+    <div class="ratings-list">
+      <div class="rating-card" *ngFor="let r of getFilteredRatings()">
+        <div class="rating-header">
+          <div class="rater-avatar">{{ r.retailerEmail?.charAt(0).toUpperCase() }}</div>
+          <div class="rater-meta">
+            <div class="rater-name">
+              {{ r.retailerEmail }}
+              <span class="badge badge-verified">Verified Buyer</span>
+            </div>
+            <div class="stars-card">{{ stars(r.rating) }}</div>
+          </div>
+          <div class="rating-date">{{ r.createdAt | date:'dd MMM yyyy' }}</div>
+        </div>
+        
+        <div class="review-body">
+          <p class="review-text">"{{ r.review || 'No review message left.' }}"</p>
+          
+          <!-- Image Gallery Grid -->
+          <div *ngIf="r.images && r.images.length > 0" class="image-gallery">
+            <div class="gallery-item" *ngFor="let img of r.images; let idx = index" (click)="openLightbox(r, idx)">
+              <img [src]="getRatingImgUrl(img)" alt="Review image" loading="lazy" />
+              <div class="item-overlay">
+                <span class="zoom-icon">🔍</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="getFilteredRatings().length === 0" class="empty-state-container">
+        <div class="empty-icon-large">📂</div>
+        <h3>No matching reviews found</h3>
+        <p>Try adjusting your rating filters or check back later.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Fullscreen Lightbox Modal -->
+  <div class="lightbox-overlay" *ngIf="showLightbox" (click)="closeLightbox()">
+    <button class="lightbox-close" (click)="closeLightbox()">&times;</button>
+    
+    <div class="lightbox-container" (click)="$event.stopPropagation()">
+      <!-- Main Image Viewport -->
+      <div class="lightbox-viewer">
+        <button class="nav-arrow prev-arrow" *ngIf="activeReview?.images?.length > 1" (click)="prevImage($event)">&#10094;</button>
+        
+        <div class="lightbox-image-wrap">
+          <img [src]="getRatingImgUrl(activeReview.images[activeImageIndex])" class="lightbox-image" alt="Expanded review view" />
+          <div class="image-counter">Image {{ activeImageIndex + 1 }} of {{ activeReview.images.length }}</div>
+        </div>
+        
+        <button class="nav-arrow next-arrow" *ngIf="activeReview?.images?.length > 1" (click)="nextImage($event)">&#10095;</button>
+      </div>
+
+      <!-- Sidebar Review Details -->
+      <div class="lightbox-sidebar">
+        <div class="sidebar-header">
+          <div class="rater-avatar small">{{ activeReview?.retailerEmail?.charAt(0).toUpperCase() }}</div>
+          <div>
+            <div class="sidebar-email">{{ activeReview?.retailerEmail }}</div>
+            <div class="sidebar-date">{{ activeReview?.createdAt | date:'dd MMM yyyy' }}</div>
+          </div>
+        </div>
+        
+        <hr class="sidebar-divider" />
+        
+        <div class="sidebar-body">
+          <div class="sidebar-rating">
+            <span class="stars-sidebar">{{ stars(activeReview?.rating) }}</span>
+            <span class="rating-num-label">{{ activeReview?.rating }} / 5</span>
+          </div>
+          <p class="sidebar-review-text">"{{ activeReview?.review || 'No review message left.' }}"</p>
+        </div>
+
+        <div class="sidebar-footer" *ngIf="activeReview?.images?.length > 1">
+          <div class="thumbnail-strip-label">All review photos:</div>
+          <div class="thumbnail-strip">
+            <div class="strip-thumb" *ngFor="let img of activeReview.images; let idx = index" 
+                 [class.active]="idx === activeImageIndex"
+                 (click)="activeImageIndex = idx">
+              <img [src]="getRatingImgUrl(img)" alt="Thumbnail" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </app-layout>
