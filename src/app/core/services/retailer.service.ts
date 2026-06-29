@@ -77,4 +77,16 @@ export class RetailerService {
   getTodaySalesSummary(): Observable<ApiResponse<any>> {
     return this.http.get<ApiResponse<any>>(`${this.base}/sales/today-summary`);
   }
+
+  submitOrderReview(orderId: number, rating: number, review: string, files: File[]): Observable<ApiResponse<any>> {
+    const formData = new FormData();
+    formData.append('rating', rating.toString());
+    formData.append('review', review);
+    if (files && files.length > 0) {
+      for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+      }
+    }
+    return this.http.post<ApiResponse<any>>(`${this.base}/orders/${orderId}/review`, formData);
+  }
 }

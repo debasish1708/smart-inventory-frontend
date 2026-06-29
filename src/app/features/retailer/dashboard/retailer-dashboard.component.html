@@ -122,13 +122,17 @@
           <p>No orders yet</p>
         </div>
         <table *ngIf="recentOrders.length > 0">
-          <thead><tr><th>ID</th><th>Supplier</th><th>Status</th><th>Date</th></tr></thead>
+          <thead><tr><th>ID</th><th>Supplier</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
           <tbody>
             <tr *ngFor="let o of recentOrders">
               <td>#{{ o.id }}</td>
               <td>{{ o.supplierEmail || '—' }}</td>
-              <td><span class="badge" [class]="'badge-' + o.status.toLowerCase()">{{ o.status }}</span></td>
+              <td>
+                <span class="badge" [class]="'badge-' + o.status.toLowerCase()">{{ o.status }}</span>
+                <span *ngIf="o.reviewed" class="badge badge-active" style="margin-left: 6px; font-size: 9.5px; padding: 2px 6px;">Reviewed</span>
+              </td>
               <td>{{ o.orderDate | date:'dd MMM' }}</td>
+              <td><button class="btn-sm btn-info" (click)="viewOrder(o)">View</button></td>
             </tr>
           </tbody>
         </table>
@@ -178,5 +182,95 @@
     </div>
     </ng-container>
   </ng-container>
+
+  <div class="modal-overlay" *ngIf="selected" (click)="closeDetail()">
+    <div class="modal" (click)="$event.stopPropagation()" style="max-width: 500px;">
+      <h3>Order #{{ selected.id }} Details</h3>
+      <p><strong>Supplier:</strong> {{ selected.supplierEmail || '—' }}</p>
+      <p><strong>Status:</strong> <span class="badge" [class]="'badge-' + selected.status.toLowerCase()">{{ selected.status }}</span></p>
+      <p *ngIf="selected.reviewed"><strong>Review Status:</strong> <span class="badge badge-active">Reviewed</span></p>
+      <p><strong>Order Date:</strong> {{ selected.orderDate | date:'dd MMM yyyy HH:mm' }}</p>
+      <p *ngIf="selected.deliveredDate"><strong>Delivered:</strong> {{ selected.deliveredDate | date:'dd MMM yyyy' }}</p>
+      
+      <div style="margin-top: 16px;">
+        <h4 style="margin-bottom: 8px;">Items Ordered</h4>
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+          <thead>
+            <tr style="background: #f8fafc; border-bottom: 1.5px solid #e2e8f0; text-align: left;">
+              <th style="padding: 6px;">Product</th>
+              <th style="padding: 6px; text-align: right;">Qty</th>
+              <th style="padding: 6px; text-align: right;">Price</th>
+              <th style="padding: 6px; text-align: right;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of selected.items" style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 6px;">{{ item.productName }}</td>
+              <td style="padding: 6px; text-align: right;">{{ item.quantity }} {{ item.unit || 'units' }}</td>
+              <td style="padding: 6px; text-align: right;">₹{{ item.price | number:'1.2-2' }}</td>
+              <td style="padding: 6px; text-align: right; font-weight: 700;">₹{{ (item.price * item.quantity) | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="text-align: right; margin-top: 12px; font-weight: 850; font-size: 15px; color: #047857;">
+          Total Amount: ₹{{ selected.totalAmount | number:'1.2-2' }}
+        </div>
+      </div>
+
+      <!-- Review Section -->
+      <div *ngIf="isEligibleForReview(selected)" style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 16px;">
+        <h4 style="margin-bottom: 8px; color: #1e293b; font-weight: 700;">⭐ Rate and Review Supplier</h4>
+        <button *ngIf="!showReviewForm" class="btn-sm btn-info" style="width: 100%; padding: 8px 12px;" (click)="showReviewForm = true">Write a Review</button>
+        
+        <div *ngIf="showReviewForm" style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+          <!-- Star selector -->
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 13.5px; font-weight: 600; color: #475569;">Rating:</span>
+            <div style="display: flex; gap: 4px;">
+              <span *ngFor="let star of [1,2,3,4,5]" 
+                    (click)="selectStar(star)" 
+                    style="cursor: pointer; font-size: 22px; transition: color 0.15s ease;"
+                    [style.color]="star <= reviewRating ? '#f57c00' : '#d1d5db'">
+                ★
+              </span>
+            </div>
+          </div>
+
+          <!-- Comment box -->
+          <div class="form-group" style="margin-bottom: 0;">
+            <textarea [(ngModel)]="reviewText" placeholder="Write your review here... (optional)" rows="3" style="font-size: 13px;"></textarea>
+          </div>
+
+          <!-- Image upload -->
+          <div>
+            <label style="display: block; font-size: 12.5px; font-weight: 650; color: #475569; margin-bottom: 4px;">Upload Review Images (optional)</label>
+            <input type="file" multiple (change)="onFileSelected($event)" accept="image/*" style="font-size: 12.5px;" />
+            <div *ngIf="selectedFiles.length > 0" style="font-size: 11.5px; color: #64748b; margin-top: 4px;">
+              Selected files: {{ selectedFiles.length }}
+            </div>
+          </div>
+
+          <!-- Alert boxes -->
+          <div *ngIf="reviewError" class="alert alert-error" style="margin: 0; padding: 8px 12px; font-size: 12px;">
+            {{ reviewError }}
+          </div>
+          <div *ngIf="reviewSuccess" class="alert alert-success" style="margin: 0; padding: 8px 12px; font-size: 12px;">
+            {{ reviewSuccess }}
+          </div>
+
+          <!-- Form Action Buttons -->
+          <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px;">
+            <button class="btn-sm btn-secondary" style="padding: 6px 12px;" (click)="showReviewForm = false" [disabled]="reviewing">Cancel</button>
+            <button class="btn-sm btn-success" style="padding: 6px 12px;" (click)="submitReview()" [disabled]="reviewing">
+              <span *ngIf="reviewing" class="spinner"></span>
+              Submit Review
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer" style="margin-top:20px;"><button class="btn-secondary" (click)="closeDetail()">Close</button></div>
+    </div>
+  </div>
 
 </app-layout>

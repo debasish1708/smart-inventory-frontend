@@ -20,6 +20,14 @@ export class RetailerOrdersComponent implements OnInit {
   loading = true;
   selected: any = null;
 
+  showReviewForm = false;
+  reviewRating = 5;
+  reviewText = '';
+  selectedFiles: File[] = [];
+  reviewing = false;
+  reviewError = '';
+  reviewSuccess = '';
+
   constructor(private svc: RetailerService) {}
   ngOnInit() { this.load(); }
 
@@ -36,6 +44,65 @@ export class RetailerOrdersComponent implements OnInit {
       : [...this.orders];
   }
 
-  viewOrder(o: any) { this.selected = o; }
-  closeDetail()     { this.selected = null; }
+  viewOrder(o: any) {
+    this.selected = o;
+    this.showReviewForm = false;
+    this.reviewRating = 5;
+    this.reviewText = '';
+    this.selectedFiles = [];
+    this.reviewError = '';
+    this.reviewSuccess = '';
+  }
+
+  closeDetail() {
+    this.selected = null;
+    this.showReviewForm = false;
+  }
+
+  isEligibleForReview(order: any): boolean {
+    if (!order) return false;
+    if (order.status !== 'DELIVERED' || order.reviewed) return false;
+    if (!order.deliveredDate) return false;
+    const delivered = new Date(order.deliveredDate).getTime();
+    const now = new Date().getTime();
+    const diffDays = (now - delivered) / (1000 * 60 * 60 * 24);
+    return diffDays >= 0 && diffDays <= 7;
+  }
+
+  selectStar(val: number) {
+    this.reviewRating = val;
+  }
+
+  onFileSelected(event: any) {
+    if (event.target.files) {
+      this.selectedFiles = Array.from(event.target.files);
+    }
+  }
+
+  submitReview() {
+    if (!this.selected) return;
+    this.reviewing = true;
+    this.reviewError = '';
+    this.reviewSuccess = '';
+
+    this.svc.submitOrderReview(this.selected.id, this.reviewRating, this.reviewText, this.selectedFiles).subscribe({
+      next: r => {
+        this.reviewing = false;
+        if (r.success) {
+          this.reviewSuccess = 'Review submitted successfully!';
+          this.selected.reviewed = true;
+          this.load();
+          setTimeout(() => {
+            this.closeDetail();
+          }, 1500);
+        } else {
+          this.reviewError = r.message || 'Failed to submit review.';
+        }
+      },
+      error: err => {
+        this.reviewing = false;
+        this.reviewError = err.error?.message || 'Error occurred while submitting review.';
+      }
+    });
+  }
 }

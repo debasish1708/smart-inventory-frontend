@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { LayoutComponent } from '../../../shared/components/layout/layout.component';
 import { RetailerService } from '../../../core/services/retailer.service';
 import { RETAILER_NAV } from '../retailer.nav';
+import { environment } from '../../../../environments/environment';
 
 @Component({ selector:'app-retailer-ratings', standalone:true,
   imports:[CommonModule, LayoutComponent],
@@ -13,6 +14,11 @@ export class RetailerRatingsComponent implements OnInit {
   ratings: any[] = [];
   loading = true;
   avgRating = 0;
+
+  getRatingImgUrl(filename: string): string {
+    if (!filename) return '';
+    return `${environment.apiUrl}/profile/image/ratings/${filename}`;
+  }
   constructor(private svc: RetailerService) {}
   ngOnInit() {
     this.svc.getRatings().subscribe({

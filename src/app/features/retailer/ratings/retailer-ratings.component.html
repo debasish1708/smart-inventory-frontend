@@ -15,6 +15,15 @@
         <div class="rating-date">{{ r.createdAt | date:'dd MMM yyyy' }}</div>
       </div>
       <p class="review-text">{{ r.review }}</p>
+      
+      <!-- Review images -->
+      <div *ngIf="r.images && r.images.length > 0" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+        <a *ngFor="let img of r.images" [href]="getRatingImgUrl(img)" target="_blank" style="display: block;">
+          <img [src]="getRatingImgUrl(img)" 
+               style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; transition: transform 0.2s;"
+               title="Click to view full size" />
+        </a>
+      </div>
     </div>
     <div *ngIf="ratings.length===0" class="empty-state"><div class="empty-icon">⭐</div><p>No ratings yet</p></div>
   </div>

@@ -51,11 +51,13 @@ export interface Order {
   supplierEmail?: string; retailerEmail?: string;
   items?: OrderItemResponse[];
   totalAmount?: number;
+  reviewed?: boolean;
 }
 
 export interface Rating {
   id: number; rating: number; review: string;
   supplierEmail?: string; retailerEmail?: string; createdAt: string;
+  images?: string[];
 }
 
 export interface SupplierMatch {
