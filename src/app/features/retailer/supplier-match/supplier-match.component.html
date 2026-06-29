@@ -109,7 +109,10 @@
       <div class="match-card" *ngFor="let m of filtered" [style.border]="m === bestMatch ? '2px solid #10b981' : '1px solid #e5e7eb'" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative;">
         <div *ngIf="m === bestMatch" style="position: absolute; top: -12px; right: 15px; background: #10b981; color: white; padding: 3px 10px; font-size: 10px; font-weight: 750; border-radius: 20px; text-transform: uppercase;">Best Match</div>
         <div class="match-header" style="display: flex; gap: 12px; align-items: center; margin-bottom: 14px;">
-          <div class="supplier-avatar" style="width: 44px; height: 44px; border-radius: 50%; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">{{ m.supplierName?.charAt(0) }}</div>
+          <div class="supplier-avatar-container" style="width: 44px; height: 44px; border-radius: 50%; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border: 1.5px solid #e2e8f0;">
+            <img *ngIf="m.profileImageUrl" [src]="getProfileImgUrl(m.profileImageUrl)" style="width: 100%; height: 100%; object-fit: cover;" alt="Supplier Avatar" />
+            <div *ngIf="!m.profileImageUrl" style="width: 100%; height: 100%; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px;">{{ m.supplierName?.charAt(0) }}</div>
+          </div>
           <div>
             <div class="supplier-name" style="font-weight: 700; color: #1e293b; font-size: 15px;">{{ m.supplierName }}</div>
             <div class="business-name" style="color: #64748b; font-size: 12px;">{{ m.businessName }}</div>

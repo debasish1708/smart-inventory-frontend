@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { LayoutComponent } from '../../../shared/components/layout/layout.component';
 import { RetailerService } from '../../../core/services/retailer.service';
 import { RETAILER_NAV } from '../retailer.nav';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-supplier-match',
@@ -394,13 +395,18 @@ export class SupplierMatchComponent implements OnInit, OnDestroy {
     return '★'.repeat(Math.round(r)) + '☆'.repeat(5 - Math.round(r));
   }
 
+  getProfileImgUrl(filename: string): string {
+    if (!filename) return '';
+    return `${environment.apiUrl}/profile/image/supplier/${filename}`;
+  }
+
   getMockData() {
     return [
-      { supplierId: 1, supplierName: 'Ravi Traders', businessName: 'Ravi Suppliers Pvt Ltd', productName: 'Basmati Rice', price: 52, moq: 50, stockQuantity: 500, rating: 4.5, leadTime: 2 },
-      { supplierId: 2, supplierName: 'Sharma Bros', businessName: 'Sharma Brothers', productName: 'Basmati Rice', price: 48, moq: 100, stockQuantity: 1200, rating: 4.2, leadTime: 3 },
-      { supplierId: 4, supplierName: 'Balaji Foodgrains', businessName: 'Balaji Wholesale Ltd', productName: 'Basmati Rice', price: 55, moq: 30, stockQuantity: 400, rating: 4.7, leadTime: 1 },
-      { supplierId: 3, supplierName: 'Green Farms', businessName: 'Green Farms Co.', productName: 'Wheat Flour', price: 30, moq: 25, stockQuantity: 800, rating: 4.8, leadTime: 1 },
-      { supplierId: 5, supplierName: 'Apex Organics', businessName: 'Apex Organic Foods', productName: 'Wheat Flour', price: 35, moq: 10, stockQuantity: 600, rating: 4.4, leadTime: 2 },
+      { supplierId: 1, supplierName: 'Ravi Traders', businessName: 'Ravi Suppliers Pvt Ltd', productName: 'Basmati Rice', price: 52, moq: 50, stockQuantity: 500, rating: 4.5, leadTime: 2, profileImageUrl: 'supplier_1.jpg' },
+      { supplierId: 2, supplierName: 'Sharma Bros', businessName: 'Sharma Brothers', productName: 'Basmati Rice', price: 48, moq: 100, stockQuantity: 1200, rating: 4.2, leadTime: 3, profileImageUrl: 'supplier_2.jpg' },
+      { supplierId: 4, supplierName: 'Balaji Foodgrains', businessName: 'Balaji Wholesale Ltd', productName: 'Basmati Rice', price: 55, moq: 30, stockQuantity: 400, rating: 4.7, leadTime: 1, profileImageUrl: 'supplier_3.jpg' },
+      { supplierId: 3, supplierName: 'Green Farms', businessName: 'Green Farms Co.', productName: 'Wheat Flour', price: 30, moq: 25, stockQuantity: 800, rating: 4.8, leadTime: 1, profileImageUrl: 'supplier_4.jpg' },
+      { supplierId: 5, supplierName: 'Apex Organics', businessName: 'Apex Organic Foods', productName: 'Wheat Flour', price: 35, moq: 10, stockQuantity: 600, rating: 4.4, leadTime: 2, profileImageUrl: 'supplier_1.jpg' },
     ];
   }
 }
