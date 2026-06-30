@@ -94,3 +94,50 @@ export interface CatalogProduct {
   categoryName?: string;
 }
 
+export interface RetailerDashboardResponse {
+  totalInventoryItems: number;
+  totalInventoryQuantity: number;
+  totalInventoryValue: number;
+  lowStockCount: number;
+  totalSalesRevenue: number;
+  totalSalesTransactions: number;
+  todaySalesRevenue: number;
+  todaySalesTransactions: number;
+  totalPurchases: number;
+  totalSupplierOrders: number;
+  pendingSupplierOrders: number;
+  topSupplierName: string;
+  topProductSold: string;
+}
+
+export interface MonthlySalesTrend {
+  month: string;
+  sales: number;
+  growth: number;
+}
+
+export interface RegionalDemandTrend {
+  productName: string;
+  demandScore: number;
+  trend: string;
+  avgPrice: number;
+}
+
+export interface RetailerAnalyticsResponse {
+  totalOrders: number;
+  totalRevenue: number;
+  topProduct: string;
+  monthlyGrowth: number;
+  monthlySalesTrend: MonthlySalesTrend[];
+  regionalDemand: RegionalDemandTrend[];
+}
+
+export interface SupplierAnalyticsResponse {
+  totalOrders: number;
+  totalRevenue: number;
+  topProduct: string;
+  avgRating: number;
+  monthlySalesTrend: MonthlySalesTrend[];
+}
+
+

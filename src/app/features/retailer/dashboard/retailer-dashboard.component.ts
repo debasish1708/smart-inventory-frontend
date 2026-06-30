@@ -6,6 +6,7 @@ import { RetailerService } from '../../../core/services/retailer.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { FormsModule } from '@angular/forms';
 import { RETAILER_NAV } from '../retailer.nav';
+import { RetailerDashboardResponse } from '../../../core/models/auth.models';
 
 @Component({
   selector: 'app-retailer-dashboard',
@@ -23,6 +24,7 @@ export class RetailerDashboardComponent implements OnInit {
   loading = true;
   subscription: any = null;
   hasActiveSubscription = false;
+  dashboardStats: RetailerDashboardResponse | null = null;
 
   selected: any = null;
   showReviewForm = false;
@@ -73,26 +75,36 @@ export class RetailerDashboardComponent implements OnInit {
   }
 
   loadDashboard() {
+    this.retailerSvc.getDashboardStats().subscribe({
+      next: r => {
+        if (r.success) {
+          this.dashboardStats = r.data;
+          this.stats.inventory = r.data.totalInventoryItems;
+          this.stats.orders = r.data.totalSupplierOrders;
+          this.stats.lowStock = r.data.lowStockCount;
+          this.stats.pendingOrders = r.data.pendingSupplierOrders;
+        }
+      }
+    });
+
     this.retailerSvc.getInventory().subscribe({
       next: r => {
         if (r.success) {
-          this.stats.inventory = r.data.length;
           this.lowStockItems = r.data.filter((i: any) => i.quantity <= (i.thresholdValue ?? 10));
-          this.stats.lowStock = this.lowStockItems.length;
         }
         this.loading = false;
       },
       error: () => { this.loading = false; }
     });
+
     this.retailerSvc.getOrders().subscribe({
       next: r => {
         if (r.success) {
           this.recentOrders = r.data.slice(0, 5);
-          this.stats.orders = r.data.length;
-          this.stats.pendingOrders = r.data.filter((o: any) => o.status === 'PENDING').length;
         }
       }
     });
+
     this.retailerSvc.getNotifications().subscribe({
       next: r => { if (r.success) this.notifications = r.data.slice(0, 4); }
     });

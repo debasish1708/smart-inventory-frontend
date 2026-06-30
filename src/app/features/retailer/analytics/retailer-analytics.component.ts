@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { LayoutComponent } from '../../../shared/components/layout/layout.component';
 import { RetailerService } from '../../../core/services/retailer.service';
 import { ProfileService } from '../../../core/services/profile.service';
-import { AnalyticsResponse } from '../../../core/models/auth.models';
+import { RetailerAnalyticsResponse } from '../../../core/models/auth.models';
 import { RETAILER_NAV } from '../retailer.nav';
 
 @Component({
@@ -15,29 +15,13 @@ import { RETAILER_NAV } from '../retailer.nav';
 })
 export class RetailerAnalyticsComponent implements OnInit {
   nav = RETAILER_NAV;
-  summary: AnalyticsResponse = { totalOrders: 0, totalRevenue: 0, topProduct: '—', monthlyGrowth: 0 };
+  summary: any = { totalOrders: 0, totalRevenue: 0, topProduct: '—', monthlyGrowth: 0 };
   inventoryStats = { ok: 0, low: 0, out: 0 };
   loading = true;
   userCity = 'Bengaluru'; // Default fallback city
 
-  // Monthly growth report data (business logic requirement)
-  monthlyGrowthTrend = [
-    { month: 'Jan', sales: 15000, growth: 0 },
-    { month: 'Feb', sales: 18500, growth: 23.3 },
-    { month: 'Mar', sales: 24000, growth: 29.7 },
-    { month: 'Apr', sales: 22000, growth: -8.3 },
-    { month: 'May', sales: 29500, growth: 34.1 },
-    { month: 'Jun', sales: 38200, growth: 29.5 }
-  ];
-
-  // Localized/regional demand analysis (business logic requirement)
-  regionalDemand = [
-    { productName: 'Basmati Rice', demandScore: 96, trend: 'UP', avgPrice: 54, activeShops: 18 },
-    { productName: 'Wheat Flour', demandScore: 90, trend: 'UP', avgPrice: 35, activeShops: 24 },
-    { productName: 'Refined Oil', demandScore: 93, trend: 'STABLE', avgPrice: 135, activeShops: 12 },
-    { productName: 'White Sugar', demandScore: 78, trend: 'DOWN', avgPrice: 40, activeShops: 21 },
-    { productName: 'Iodized Salt', demandScore: 84, trend: 'STABLE', avgPrice: 22, activeShops: 35 }
-  ];
+  monthlyGrowthTrend: any[] = [];
+  regionalDemand: any[] = [];
 
   constructor(private svc: RetailerService, private profileSvc: ProfileService) {}
 
@@ -46,9 +30,11 @@ export class RetailerAnalyticsComponent implements OnInit {
       next: r => {
         if (r.success && r.data) {
           this.summary = r.data;
-          // Sync backend growth rate if returned
-          if (r.data.monthlyGrowth) {
-            this.monthlyGrowthTrend[this.monthlyGrowthTrend.length - 1].growth = r.data.monthlyGrowth;
+          if (r.data.monthlySalesTrend) {
+            this.monthlyGrowthTrend = r.data.monthlySalesTrend;
+          }
+          if (r.data.regionalDemand) {
+            this.regionalDemand = r.data.regionalDemand;
           }
         }
       }

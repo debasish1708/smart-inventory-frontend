@@ -56,26 +56,109 @@
     <ng-container *ngIf="hasActiveSubscription">
       <div class="welcome-msg">
         <h2>Welcome back, {{ userName }}! 👋</h2>
-        <p>Here's your inventory & order summary for today.</p>
+        <p>Here's your comprehensive business performance overview for today.</p>
       </div>
 
-    <!-- Stats -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon bg-blue">📦</div>
-        <div class="stat-info"><h3>{{ stats.inventory }}</h3><p>Inventory Items</p></div>
+    <!-- Premium Business Metrics Grid -->
+    <div class="biz-grid">
+      <!-- Total Sales Revenue -->
+      <div class="biz-card sales">
+        <div class="biz-content">
+          <div class="biz-icon">💰</div>
+          <div>
+            <div class="biz-label">Total Sales Revenue</div>
+            <div class="biz-value">₹{{ (dashboardStats?.totalSalesRevenue ?? 0) | number:'1.2-2' }}</div>
+            <div class="biz-subtext">{{ dashboardStats?.totalSalesTransactions ?? 0 }} Checkout Sales</div>
+          </div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon bg-orange">🛒</div>
-        <div class="stat-info"><h3>{{ stats.orders }}</h3><p>Total Orders</p></div>
+
+      <!-- Supplier Expenses (Purchases) -->
+      <div class="biz-card expenses">
+        <div class="biz-content">
+          <div class="biz-icon">📥</div>
+          <div>
+            <div class="biz-label">Supplier Expenses</div>
+            <div class="biz-value">₹{{ (dashboardStats?.totalPurchases ?? 0) | number:'1.2-2' }}</div>
+            <div class="biz-subtext">{{ dashboardStats?.totalSupplierOrders ?? 0 }} B2B Orders</div>
+          </div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon bg-red">⚠️</div>
-        <div class="stat-info"><h3>{{ stats.lowStock }}</h3><p>Low Stock Items</p></div>
+
+      <!-- Net Trade Balance -->
+      <div class="biz-card" [class.balance-positive]="(dashboardStats?.totalSalesRevenue ?? 0) >= (dashboardStats?.totalPurchases ?? 0)" [class.balance-negative]="(dashboardStats?.totalSalesRevenue ?? 0) < (dashboardStats?.totalPurchases ?? 0)">
+        <div class="biz-content">
+          <div class="biz-icon">⚖️</div>
+          <div>
+            <div class="biz-label">Net B2B Flow Balance</div>
+            <div class="biz-value">
+              <span *ngIf="(dashboardStats?.totalSalesRevenue ?? 0) >= (dashboardStats?.totalPurchases ?? 0)">+</span>
+              ₹{{ ((dashboardStats?.totalSalesRevenue ?? 0) - (dashboardStats?.totalPurchases ?? 0)) | number:'1.2-2' }}
+            </div>
+            <div class="biz-subtext">Sales vs Supplier Costs</div>
+          </div>
+        </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon bg-purple">⏳</div>
-        <div class="stat-info"><h3>{{ stats.pendingOrders }}</h3><p>Pending Orders</p></div>
+
+      <!-- Today's Checkout Activity -->
+      <div class="biz-card activity">
+        <div class="biz-content">
+          <div class="biz-icon">⚡</div>
+          <div>
+            <div class="biz-label">Today's Sales Revenue</div>
+            <div class="biz-value">₹{{ (dashboardStats?.todaySalesRevenue ?? 0) | number:'1.2-2' }}</div>
+            <div class="biz-subtext">{{ dashboardStats?.todaySalesTransactions ?? 0 }} Sales Completed Today</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Secondary Operations Breakdown Panels -->
+    <div class="metrics-section">
+      <!-- Inventory Assets Panel -->
+      <div class="metrics-panel">
+        <div class="metrics-title">
+          <span class="metrics-title-icon">📦</span> Stock Assets & Valuation
+        </div>
+        <div class="metrics-row">
+          <span class="metrics-key">Unique Products Tracked</span>
+          <span class="metrics-val highlight-val">{{ dashboardStats?.totalInventoryItems ?? 0 }} items</span>
+        </div>
+        <div class="metrics-row">
+          <span class="metrics-key">Total Units in Stock</span>
+          <span class="metrics-val">{{ (dashboardStats?.totalInventoryQuantity ?? 0) | number }} units</span>
+        </div>
+        <div class="metrics-row">
+          <span class="metrics-key">Inventory Valuation</span>
+          <span class="metrics-val success-val">₹{{ (dashboardStats?.totalInventoryValue ?? 0) | number:'1.2-2' }}</span>
+        </div>
+        <div class="metrics-row">
+          <span class="metrics-key">Low Stock Warnings</span>
+          <span class="metrics-val" [class.warning-val]="(dashboardStats?.lowStockCount ?? 0) > 0">{{ dashboardStats?.lowStockCount ?? 0 }} items</span>
+        </div>
+      </div>
+
+      <!-- B2B Procurement Operations Panel -->
+      <div class="metrics-panel">
+        <div class="metrics-title">
+          <span class="metrics-title-icon">🤝</span> B2B Supplier Operations
+        </div>
+        <div class="metrics-row">
+          <span class="metrics-key">Top Supplier Partner</span>
+          <span class="metrics-val highlight-val">{{ dashboardStats?.topSupplierName || '—' }}</span>
+        </div>
+        <div class="metrics-row">
+          <span class="metrics-key">Best Selling Product</span>
+          <span class="metrics-val success-val">{{ dashboardStats?.topProductSold || '—' }}</span>
+        </div>
+        <div class="metrics-row">
+          <span class="metrics-key">Total B2B Orders</span>
+          <span class="metrics-val">{{ dashboardStats?.totalSupplierOrders ?? 0 }} placed</span>
+        </div>
+        <div class="metrics-row">
+          <span class="metrics-key">Awaiting Delivery</span>
+          <span class="metrics-val" [class.warning-val]="(dashboardStats?.pendingSupplierOrders ?? 0) > 0">{{ dashboardStats?.pendingSupplierOrders ?? 0 }} orders</span>
+        </div>
       </div>
     </div>
 

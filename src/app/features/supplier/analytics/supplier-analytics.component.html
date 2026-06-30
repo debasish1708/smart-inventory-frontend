@@ -2,14 +2,36 @@
   <div *ngIf="loading" class="empty-state card"><div class="empty-icon">⏳</div><p>Loading analytics…</p></div>
 
   <ng-container *ngIf="!loading">
-    <div class="stats-grid">
+    <div class="stats-grid" style="margin-bottom: 24px;">
       <div class="stat-card"><div class="stat-icon bg-purple">📋</div><div class="stat-info"><h3>{{ summary.totalOrders }}</h3><p>Total Orders</p></div></div>
       <div class="stat-card"><div class="stat-icon bg-green">💰</div><div class="stat-info"><h3>₹{{ summary.totalRevenue | number:'1.0-0' }}</h3><p>Total Revenue</p></div></div>
       <div class="stat-card"><div class="stat-icon bg-orange">🏆</div><div class="stat-info"><h3 style="font-size:16px">{{ summary.topProduct }}</h3><p>Top Product</p></div></div>
-      <div class="stat-card"><div class="stat-icon bg-teal">⭐</div><div class="stat-info"><h3>{{ summary.monthlyGrowth | number:'1.1-1' }}</h3><p>Avg Rating</p></div></div>
+      <div class="stat-card"><div class="stat-icon bg-teal">⭐</div><div class="stat-info"><h3>{{ (summary.avgRating || 0) | number:'1.1-1' }}</h3><p>Avg Rating</p></div></div>
     </div>
 
-    <div class="card">
+    <!-- Monthly B2B growth report chart -->
+    <div class="card" style="margin-bottom: 24px;">
+      <div class="card-title" style="display: flex; align-items: center; gap: 8px;">
+        📈 Wholesale Revenue & Monthly Growth Report
+      </div>
+      <p style="font-size: 12.5px; color: #64748b;">Monthly breakdown of wholesale sales revenue from delivered B2B orders with month-over-month growth rate percentage.</p>
+      
+      <div class="bar-chart" style="display: flex; align-items: flex-end; justify-content: space-around; height: 160px; padding: 25px 10px 10px; background: #f8fafc; border-radius: 12px; margin-top: 20px; border: 1px solid #edf2f7;">
+        <div class="bar-wrap" *ngFor="let t of monthlyGrowthTrend" style="display: flex; flex-direction: column; align-items: center; flex: 1; position: relative;">
+          <!-- Tooltip value -->
+          <span style="font-size: 10px; font-weight: 700; color: #1e3a8a; margin-bottom: 2px;">₹{{ t.sales | number:'1.0-0' }}</span>
+          <!-- CSS bar -->
+          <div class="bar" [style.height.px]="barHeight(t.sales)" style="width: 24px; background: linear-gradient(to top, #7c3aed, #a78bfa); border-radius: 4px 4px 0 0; transition: height .4s ease; min-height: 4px;"></div>
+          <!-- Labels -->
+          <span style="font-size: 10.5px; color: #475569; font-weight: 600; margin-top: 4px;">{{ t.month }}</span>
+          <span [style.color]="t.growth >= 0 ? '#10b981' : '#ef4444'" style="font-size: 9px; font-weight: 750;">
+            {{ t.growth > 0 ? '+' : '' }}{{ t.growth !== 0 ? t.growth + '%' : '—' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 24px;">
       <div class="card-title">🏭 Listings Status</div>
       <div class="health-row">
         <div class="health-item"><span class="dot green"></span> Active: {{ inventoryByStatus.active }}</div>

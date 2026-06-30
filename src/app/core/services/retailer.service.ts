@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ApiResponse, Order, Rating, InventoryItem, SupplierMatch, AnalyticsResponse, SubscriptionResponse } from '../models/auth.models';
+import { ApiResponse, Order, Rating, InventoryItem, SupplierMatch, AnalyticsResponse, SubscriptionResponse, RetailerDashboardResponse, RetailerAnalyticsResponse } from '../models/auth.models';
 
 @Injectable({ providedIn: 'root' })
 export class RetailerService {
@@ -55,8 +55,13 @@ export class RetailerService {
   }
 
   // Analytics
-  getAnalytics(): Observable<ApiResponse<AnalyticsResponse>> {
-    return this.http.get<ApiResponse<AnalyticsResponse>>(`${this.base}/analytics`);
+  getAnalytics(): Observable<ApiResponse<RetailerAnalyticsResponse>> {
+    return this.http.get<ApiResponse<RetailerAnalyticsResponse>>(`${this.base}/analytics`);
+  }
+
+  // Dashboard Stats
+  getDashboardStats(): Observable<ApiResponse<RetailerDashboardResponse>> {
+    return this.http.get<ApiResponse<RetailerDashboardResponse>>(`${this.base}/dashboard-stats`);
   }
 
   // Subscription
